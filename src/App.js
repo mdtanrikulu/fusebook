@@ -76,7 +76,7 @@ function checkSelf(fuses, fuse) {
     return fuses.has(CANNOT_UNWRAP) && fuses.has(PARENT_CANNOT_CONTROL);
   }
   if (fuse === CANNOT_CREATE_SUBDOMAIN) {
-    return true;
+    return fuses.has(CANNOT_UNWRAP) && fuses.has(PARENT_CANNOT_CONTROL);
   }
 }
 

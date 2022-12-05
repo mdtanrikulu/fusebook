@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/fusebook/static/css/main.de7f6609.css",
-    "main.js": "/fusebook/static/js/main.056b7e06.js",
+    "main.js": "/fusebook/static/js/main.a142a659.js",
     "static/js/787.8a67f869.chunk.js": "/fusebook/static/js/787.8a67f869.chunk.js",
     "index.html": "/fusebook/index.html",
     "main.de7f6609.css.map": "/fusebook/static/css/main.de7f6609.css.map",
-    "main.056b7e06.js.map": "/fusebook/static/js/main.056b7e06.js.map",
+    "main.a142a659.js.map": "/fusebook/static/js/main.a142a659.js.map",
     "787.8a67f869.chunk.js.map": "/fusebook/static/js/787.8a67f869.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.de7f6609.css",
-    "static/js/main.056b7e06.js"
+    "static/js/main.a142a659.js"
   ]
 }
