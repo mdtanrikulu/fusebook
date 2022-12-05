@@ -110,7 +110,7 @@ function generateTable(parentFuses, childFuses) {
     { backgroundColor: 'green', color: 'white' },
     { backgroundColor: 'red', color: 'white' },
   ];
-  const conditions = (fuses, key) => {
+  const conditions = (fuses, child, key) => {
     if (key === '-') return states[0];
     if (key === 'renew') return states[1];
     if (
@@ -121,7 +121,7 @@ function generateTable(parentFuses, childFuses) {
           return states[2];
         }
       }
-      if (fuses.has(PARENT_CANNOT_CONTROL)) {
+      if (child && child.has(PARENT_CANNOT_CONTROL)) {
         return states[2];
       }
       return states[1];
@@ -161,13 +161,13 @@ function generateTable(parentFuses, childFuses) {
             <tr>
               <td
                 align="center"
-                style={conditions(parentFuses, !!value[0] ? key : '-')}
+                style={conditions(parentFuses, childFuses, !!value[0] ? key : '-')}
               >
                 {!!value[0] ? key : '-'}
               </td>
               <td
                 align="center"
-                style={conditions(childFuses, !!value[1] ? key : '-')}
+                style={conditions(childFuses, null, !!value[1] ? key : '-')}
               >
                 {!!value[1] ? key : '-'}
               </td>
