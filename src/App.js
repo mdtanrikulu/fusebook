@@ -237,269 +237,267 @@ const App = () => {
     <ThemeProvider theme={lightTheme}>
       <ThorinGlobalStyles />
       <Container>
-        <Card padding="4" shadow>
-          <Grid>
-            <div>
-              <Heading>Fuse Book</Heading>
-              <Typography>Interactive Fuse Guide for NameWrapepr</Typography>
-              <InnerContainer>
-                <FieldSet legend="ens.eth">
-                  <pre>
-                    State: [{new Array(...parentFuses).join(' | ').toString()}]
-                  </pre>
-                  <Checkbox
-                    color="yellow"
-                    label={CANNOT_UNWRAP}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_UNWRAP)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_UNWRAP)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_UNWRAP
-                              )
+        <Grid>
+          <Card padding="4" shadow>
+            <Heading>Fuse Book</Heading>
+            <Typography>Interactive Fuse Guide for NameWrapepr</Typography>
+            <InnerContainer>
+              <FieldSet legend="ens.eth">
+                <pre>
+                  State: [{new Array(...parentFuses).join(' | ').toString()}]
+                </pre>
+                <Checkbox
+                  color="yellow"
+                  label={CANNOT_UNWRAP}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_UNWRAP)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_UNWRAP)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_UNWRAP
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_BURN_FUSES}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_BURN_FUSES)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_BURN_FUSES)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_BURN_FUSES
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_BURN_FUSES}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_BURN_FUSES)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_BURN_FUSES
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_SET_RESOLVER}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_SET_RESOLVER)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_SET_RESOLVER)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_SET_RESOLVER
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_SET_RESOLVER}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_SET_RESOLVER)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_SET_RESOLVER)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_SET_RESOLVER
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_SET_TTL}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_SET_TTL)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_SET_TTL)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_SET_TTL
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_SET_TTL}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_SET_TTL)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_SET_TTL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_SET_TTL
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_TRANSFER}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_TRANSFER)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_TRANSFER)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_TRANSFER
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_TRANSFER}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_TRANSFER)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_TRANSFER)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_TRANSFER
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_CREATE_SUBDOMAIN}
-                    variant="switch"
-                    disabled={!checkSelf(parentFuses, CANNOT_CREATE_SUBDOMAIN)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_CREATE_SUBDOMAIN
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_CREATE_SUBDOMAIN}
+                  variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_CREATE_SUBDOMAIN)}
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_CREATE_SUBDOMAIN
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={PARENT_CANNOT_CONTROL}
-                    variant="switch"
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== PARENT_CANNOT_CONTROL
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={PARENT_CANNOT_CONTROL}
+                  variant="switch"
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== PARENT_CANNOT_CONTROL
                             )
-                      )
-                    }
-                  />
-                </FieldSet>
-              </InnerContainer>
+                          )
+                    )
+                  }
+                />
+              </FieldSet>
+            </InnerContainer>
 
-              <InnerContainer>
-                <FieldSet legend="sub.ens.eth">
-                  <pre>
-                    State: [{new Array(...childFuses).join(' | ').toString()}]
-                  </pre>
-                  <Checkbox
-                    color="yellow"
-                    label={CANNOT_UNWRAP}
-                    disabled={!checkSelf(childFuses, CANNOT_UNWRAP)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_UNWRAP)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_UNWRAP
-                              )
+            <InnerContainer>
+              <FieldSet legend="sub.ens.eth">
+                <pre>
+                  State: [{new Array(...childFuses).join(' | ').toString()}]
+                </pre>
+                <Checkbox
+                  color="yellow"
+                  label={CANNOT_UNWRAP}
+                  disabled={!checkSelf(childFuses, CANNOT_UNWRAP)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_UNWRAP)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_UNWRAP
                             )
-                      )
-                    }
-                    variant="switch"
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_CREATE_SUBDOMAIN}
-                    disabled={!checkSelf(childFuses, CANNOT_CREATE_SUBDOMAIN)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_CREATE_SUBDOMAIN
-                              )
+                          )
+                    )
+                  }
+                  variant="switch"
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_CREATE_SUBDOMAIN}
+                  disabled={!checkSelf(childFuses, CANNOT_CREATE_SUBDOMAIN)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_CREATE_SUBDOMAIN
                             )
-                      )
-                    }
-                    variant="switch"
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_SET_RESOLVER}
-                    variant="switch"
-                    disabled={!checkSelf(childFuses, CANNOT_SET_RESOLVER)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_SET_RESOLVER)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_SET_RESOLVER
-                              )
+                          )
+                    )
+                  }
+                  variant="switch"
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_SET_RESOLVER}
+                  variant="switch"
+                  disabled={!checkSelf(childFuses, CANNOT_SET_RESOLVER)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_SET_RESOLVER)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_SET_RESOLVER
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_SET_TTL}
-                    variant="switch"
-                    disabled={!checkSelf(childFuses, CANNOT_SET_TTL)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_SET_TTL)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_SET_TTL
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_SET_TTL}
+                  variant="switch"
+                  disabled={!checkSelf(childFuses, CANNOT_SET_TTL)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_SET_TTL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_SET_TTL
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_TRANSFER}
-                    variant="switch"
-                    disabled={!checkSelf(childFuses, CANNOT_TRANSFER)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_TRANSFER)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_TRANSFER
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_TRANSFER}
+                  variant="switch"
+                  disabled={!checkSelf(childFuses, CANNOT_TRANSFER)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_TRANSFER)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_TRANSFER
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={PARENT_CANNOT_CONTROL}
-                    variant="switch"
-                    disabled={!checkParent(parentFuses, PARENT_CANNOT_CONTROL)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== PARENT_CANNOT_CONTROL
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={PARENT_CANNOT_CONTROL}
+                  variant="switch"
+                  disabled={!checkParent(parentFuses, PARENT_CANNOT_CONTROL)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== PARENT_CANNOT_CONTROL
                             )
-                      )
-                    }
-                  />
-                  <Checkbox
-                    color="red"
-                    label={CANNOT_BURN_FUSES}
-                    disabled={!checkSelf(childFuses, CANNOT_BURN_FUSES)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(CANNOT_BURN_FUSES)
-                          : new Set(
-                              [...previousState].filter(
-                                (x) => x !== CANNOT_BURN_FUSES
-                              )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
+                  color="red"
+                  label={CANNOT_BURN_FUSES}
+                  disabled={!checkSelf(childFuses, CANNOT_BURN_FUSES)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== CANNOT_BURN_FUSES
                             )
-                      )
-                    }
-                    variant="switch"
-                  />
-                </FieldSet>
-              </InnerContainer>
-            </div>
-            <div className="tableContainer">
-              {generateTable(parentFuses, childFuses)}
-            </div>
-          </Grid>
-        </Card>
+                          )
+                    )
+                  }
+                  variant="switch"
+                />
+              </FieldSet>
+            </InnerContainer>
+          </Card>
+          <div className="tableContainer">
+            {generateTable(parentFuses, childFuses)}
+          </div>
+        </Grid>
       </Container>
     </ThemeProvider>
   );
