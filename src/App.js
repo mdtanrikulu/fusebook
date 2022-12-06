@@ -7,6 +7,7 @@ import {
   FieldSet,
   Checkbox,
   Heading,
+  Toast,
   Typography,
 } from '@ensdomains/thorin';
 import './App.css';
@@ -42,10 +43,10 @@ const fusesDict = Object.freeze({
   CANNOT_BURN_FUSES: 'CANNOT_BURN_FUSES',
   CANNOT_CREATE_SUBDOMAIN: 'CANNOT_CREATE_SUBDOMAIN',
   CANNOT_TRANSFER: 'CANNOT_TRANSFER',
+  CANNOT_SET_RESOLVER: 'CANNOT_SET_RESOLVER',
   CANNOT_SET_TTL: 'CANNOT_SET_TTL',
   CANNOT_UNWRAP: 'CANNOT_UNWRAP',
   PARENT_CANNOT_CONTROL: 'PARENT_CANNOT_CONTROL',
-  USER_FUSES: 'USER_FUSES',
 });
 
 function checkParent(parentFuses, childFuse) {
@@ -61,22 +62,32 @@ function checkSelf(fuses, fuse) {
     CANNOT_BURN_FUSES,
     CANNOT_CREATE_SUBDOMAIN,
     CANNOT_TRANSFER,
+    CANNOT_SET_RESOLVER,
+    CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
-    USER_FUSES,
   } = fusesDict;
 
   if (fuse === CANNOT_UNWRAP) {
     return fuses.has(PARENT_CANNOT_CONTROL);
   }
-  if (fuse === USER_FUSES || fuse == CANNOT_TRANSFER) {
+  if (
+    // user fuses
+    fuse == CANNOT_TRANSFER ||
+    fuse === CANNOT_SET_RESOLVER ||
+    fuse === CANNOT_SET_TTL
+  ) {
     return fuses.has(CANNOT_UNWRAP) && !fuses.has(CANNOT_BURN_FUSES);
   }
   if (fuse === CANNOT_BURN_FUSES) {
     return fuses.has(CANNOT_UNWRAP) && fuses.has(PARENT_CANNOT_CONTROL);
   }
   if (fuse === CANNOT_CREATE_SUBDOMAIN) {
-    return fuses.has(CANNOT_UNWRAP) && fuses.has(PARENT_CANNOT_CONTROL);
+    return (
+      fuses.has(CANNOT_UNWRAP) &&
+      fuses.has(PARENT_CANNOT_CONTROL) &&
+      !fuses.has(CANNOT_BURN_FUSES)
+    );
   }
 }
 
@@ -85,6 +96,8 @@ function generateTable(parentFuses, childFuses) {
     CANNOT_BURN_FUSES,
     CANNOT_CREATE_SUBDOMAIN,
     CANNOT_TRANSFER,
+    CANNOT_SET_RESOLVER,
+    CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
   } = fusesDict;
@@ -96,10 +109,12 @@ function generateTable(parentFuses, childFuses) {
     setChildFuses: [1, 1],
     setSubnodeOwner: [1, 1],
     setSubnodeRecord: [1, 1],
+    setResolver: [1, 1],
+    setTTL: [1, 1],
     setRecord: [1, 1],
     setFuses: [1, 1],
-    safeTransferFrom: [1,1],
-    safeBatchTransferFrom: [1,1],
+    safeTransferFrom: [1, 1],
+    safeBatchTransferFrom: [1, 1],
     renew: [1, 1],
     unwrapETH2LD: [1, 0],
     unwrap: [1, 1],
@@ -124,6 +139,12 @@ function generateTable(parentFuses, childFuses) {
       if (child && child.has(PARENT_CANNOT_CONTROL)) {
         return states[2];
       }
+      if (
+        key === 'setSubnodeRecord' &&
+        (fuses.has(CANNOT_SET_TTL) || fuses.has(CANNOT_SET_RESOLVER))
+      ) {
+        return states[2];
+      }
       return states[1];
     }
     if (key === 'unwrap' || key == 'unwrapETH2LD') {
@@ -138,8 +159,25 @@ function generateTable(parentFuses, childFuses) {
       }
       return states[1];
     }
-    if (key === 'setFuses' || key == 'setRecord') {
+
+    if (key === 'setResolver') {
+      if (fuses.has(CANNOT_SET_RESOLVER)) {
+        return states[2];
+      }
+      return states[1];
+    }
+
+    if (key === 'setFuses' || key === 'setRecord' || key === 'setTTL') {
       if (fuses.has(CANNOT_BURN_FUSES) || !fuses.has(CANNOT_UNWRAP)) {
+        return states[2];
+      }
+      if (
+        (key === 'setRecord' || key === 'setTTL') &&
+        fuses.has(CANNOT_SET_TTL)
+      ) {
+        return states[2];
+      }
+      if (key === 'setRecord' && fuses.has(CANNOT_SET_RESOLVER)) {
         return states[2];
       }
       return states[1];
@@ -161,7 +199,11 @@ function generateTable(parentFuses, childFuses) {
             <tr>
               <td
                 align="center"
-                style={conditions(parentFuses, childFuses, !!value[0] ? key : '-')}
+                style={conditions(
+                  parentFuses,
+                  childFuses,
+                  !!value[0] ? key : '-'
+                )}
               >
                 {!!value[0] ? key : '-'}
               </td>
@@ -185,10 +227,11 @@ const App = () => {
   const {
     CANNOT_BURN_FUSES,
     CANNOT_CREATE_SUBDOMAIN,
+    CANNOT_SET_RESOLVER,
     CANNOT_TRANSFER,
+    CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
-    USER_FUSES,
   } = fusesDict;
   return (
     <ThemeProvider theme={lightTheme}>
@@ -233,6 +276,40 @@ const App = () => {
                           : new Set(
                               [...previousState].filter(
                                 (x) => x !== CANNOT_BURN_FUSES
+                              )
+                            )
+                      )
+                    }
+                  />
+                  <Checkbox
+                    color="red"
+                    label={CANNOT_SET_RESOLVER}
+                    variant="switch"
+                    disabled={!checkSelf(parentFuses, CANNOT_SET_RESOLVER)}
+                    onChange={(e) =>
+                      setParentFuses((previousState) =>
+                        e.target.checked
+                          ? new Set(previousState).add(CANNOT_SET_RESOLVER)
+                          : new Set(
+                              [...previousState].filter(
+                                (x) => x !== CANNOT_SET_RESOLVER
+                              )
+                            )
+                      )
+                    }
+                  />
+                  <Checkbox
+                    color="red"
+                    label={CANNOT_SET_TTL}
+                    variant="switch"
+                    disabled={!checkSelf(parentFuses, CANNOT_SET_TTL)}
+                    onChange={(e) =>
+                      setParentFuses((previousState) =>
+                        e.target.checked
+                          ? new Set(previousState).add(CANNOT_SET_TTL)
+                          : new Set(
+                              [...previousState].filter(
+                                (x) => x !== CANNOT_SET_TTL
                               )
                             )
                       )
@@ -288,21 +365,6 @@ const App = () => {
                       )
                     }
                   />
-                  <Checkbox
-                    color="green"
-                    label={USER_FUSES}
-                    disabled={!checkSelf(parentFuses, USER_FUSES)}
-                    onChange={(e) =>
-                      setParentFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(USER_FUSES)
-                          : new Set(
-                              [...previousState].filter((x) => x !== USER_FUSES)
-                            )
-                      )
-                    }
-                    variant="switch"
-                  />
                 </FieldSet>
               </InnerContainer>
 
@@ -347,6 +409,40 @@ const App = () => {
                   />
                   <Checkbox
                     color="red"
+                    label={CANNOT_SET_RESOLVER}
+                    variant="switch"
+                    disabled={!checkSelf(childFuses, CANNOT_SET_RESOLVER)}
+                    onChange={(e) =>
+                      setChildFuses((previousState) =>
+                        e.target.checked
+                          ? new Set(previousState).add(CANNOT_SET_RESOLVER)
+                          : new Set(
+                              [...previousState].filter(
+                                (x) => x !== CANNOT_SET_RESOLVER
+                              )
+                            )
+                      )
+                    }
+                  />
+                  <Checkbox
+                    color="red"
+                    label={CANNOT_SET_TTL}
+                    variant="switch"
+                    disabled={!checkSelf(childFuses, CANNOT_SET_TTL)}
+                    onChange={(e) =>
+                      setChildFuses((previousState) =>
+                        e.target.checked
+                          ? new Set(previousState).add(CANNOT_SET_TTL)
+                          : new Set(
+                              [...previousState].filter(
+                                (x) => x !== CANNOT_SET_TTL
+                              )
+                            )
+                      )
+                    }
+                  />
+                  <Checkbox
+                    color="red"
                     label={CANNOT_TRANSFER}
                     variant="switch"
                     disabled={!checkSelf(childFuses, CANNOT_TRANSFER)}
@@ -380,21 +476,6 @@ const App = () => {
                     }
                   />
                   <Checkbox
-                    color="green"
-                    label={USER_FUSES}
-                    disabled={!checkSelf(childFuses, USER_FUSES)}
-                    onChange={(e) =>
-                      setChildFuses((previousState) =>
-                        e.target.checked
-                          ? new Set(previousState).add(USER_FUSES)
-                          : new Set(
-                              [...previousState].filter((x) => x !== USER_FUSES)
-                            )
-                      )
-                    }
-                    variant="switch"
-                  />
-                  <Checkbox
                     color="red"
                     label={CANNOT_BURN_FUSES}
                     disabled={!checkSelf(childFuses, CANNOT_BURN_FUSES)}
@@ -414,7 +495,9 @@ const App = () => {
                 </FieldSet>
               </InnerContainer>
             </div>
-            <div className='tableContainer'>{generateTable(parentFuses, childFuses)}</div>
+            <div className="tableContainer">
+              {generateTable(parentFuses, childFuses)}
+            </div>
           </Grid>
         </Card>
       </Container>
