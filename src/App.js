@@ -18,6 +18,9 @@ const Grid = styled.div(
     grid-template-columns: repeat(2, 1fr);
     box-sizing: border-box;
     gap: 50px;
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
   `
 );
 
@@ -247,6 +250,22 @@ const App = () => {
                   State: [{new Array(...parentFuses).join(' | ').toString()}]
                 </pre>
                 <Checkbox
+                  color="red"
+                  label={PARENT_CANNOT_CONTROL}
+                  variant="switch"
+                  onChange={(e) =>
+                    setParentFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== PARENT_CANNOT_CONTROL
+                            )
+                          )
+                    )
+                  }
+                />
+                <Checkbox
                   color="yellow"
                   label={CANNOT_UNWRAP}
                   variant="switch"
@@ -258,23 +277,6 @@ const App = () => {
                         : new Set(
                             [...previousState].filter(
                               (x) => x !== CANNOT_UNWRAP
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_BURN_FUSES}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_BURN_FUSES)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_BURN_FUSES
                             )
                           )
                     )
@@ -350,15 +352,16 @@ const App = () => {
                 />
                 <Checkbox
                   color="red"
-                  label={PARENT_CANNOT_CONTROL}
+                  label={CANNOT_BURN_FUSES}
                   variant="switch"
+                  disabled={!checkSelf(parentFuses, CANNOT_BURN_FUSES)}
                   onChange={(e) =>
                     setParentFuses((previousState) =>
                       e.target.checked
-                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
+                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
                         : new Set(
                             [...previousState].filter(
-                              (x) => x !== PARENT_CANNOT_CONTROL
+                              (x) => x !== CANNOT_BURN_FUSES
                             )
                           )
                     )
@@ -372,6 +375,23 @@ const App = () => {
                 <pre>
                   State: [{new Array(...childFuses).join(' | ').toString()}]
                 </pre>
+                <Checkbox
+                  color="red"
+                  label={PARENT_CANNOT_CONTROL}
+                  variant="switch"
+                  disabled={!checkParent(parentFuses, PARENT_CANNOT_CONTROL)}
+                  onChange={(e) =>
+                    setChildFuses((previousState) =>
+                      e.target.checked
+                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
+                        : new Set(
+                            [...previousState].filter(
+                              (x) => x !== PARENT_CANNOT_CONTROL
+                            )
+                          )
+                    )
+                  }
+                />
                 <Checkbox
                   color="yellow"
                   label={CANNOT_UNWRAP}
@@ -452,23 +472,6 @@ const App = () => {
                         : new Set(
                             [...previousState].filter(
                               (x) => x !== CANNOT_TRANSFER
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={PARENT_CANNOT_CONTROL}
-                  variant="switch"
-                  disabled={!checkParent(parentFuses, PARENT_CANNOT_CONTROL)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== PARENT_CANNOT_CONTROL
                             )
                           )
                     )
