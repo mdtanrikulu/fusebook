@@ -124,9 +124,9 @@ function generateTable(parentFuses, childFuses) {
   };
 
   const states = [
-    { color: 'black' },
-    { backgroundColor: 'green', color: 'white' },
-    { backgroundColor: 'red', color: 'white' },
+    { backgroundColor: 'white', color: 'black' },
+    { backgroundColor: 'rgb(73, 179, 147)', color: 'white' }, // green
+    { backgroundColor: 'rgb(213, 85, 85)', color: 'white' }, // red
   ];
   const conditions = (fuses, child, key) => {
     if (key === '-') return states[0];
@@ -164,7 +164,7 @@ function generateTable(parentFuses, childFuses) {
     }
 
     if (key === 'setResolver') {
-      if (fuses.has(CANNOT_SET_RESOLVER)) {
+      if (!fuses.has(CANNOT_UNWRAP) || fuses.has(CANNOT_SET_RESOLVER)) {
         return states[2];
       }
       return states[1];
