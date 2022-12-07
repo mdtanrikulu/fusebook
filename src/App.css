@@ -13,7 +13,7 @@ td, th {
 
 table {
   position: sticky;
-  top: 120px;
+  top: calc(20vh - 50px);
   border-radius: 5px;
   border-style: hidden; /* hide standard table (collapsed) border */
   box-shadow: 0 0 0 2px rgb(232, 231, 231); /* this draws the table border  */ 
@@ -22,6 +22,7 @@ table {
 th {
   background-color: black;
   color: white;
+  line-height: 40px;
 }
 
 input:not(:disabled) {
