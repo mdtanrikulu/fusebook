@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css, ThemeProvider } from 'styled-components';
 import {
   ThorinGlobalStyles,
@@ -10,10 +10,11 @@ import {
   Toast,
   Typography,
 } from '@ensdomains/thorin';
+import InteractiveView from './Interactive';
 import './App.css';
 
 const Grid = styled.div(
-  ({ theme }) => css`
+  () => css`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     box-sizing: border-box;
@@ -21,6 +22,22 @@ const Grid = styled.div(
     @media (max-width: 900px) {
       grid-template-columns: 1fr;
     }
+  `
+);
+
+const Panel = styled.div(
+  () => css`
+    box-sizing: border-box;
+    margin-top: 780px;
+    height: 1000px;
+  `
+);
+
+const Rail = styled.div(
+  () => css`
+    height: 4000px;
+    position: relative;
+    margin-bottom: 100px;
   `
 );
 
@@ -197,9 +214,9 @@ function generateTable(parentFuses, childFuses) {
         </tr>
       </thead>
       <tbody>
-        {Object.entries(methods).map(([key, value]) => {
+        {Object.entries(methods).map(([key, value], index) => {
           return (
-            <tr>
+            <tr key={`table-${index}`}>
               <td
                 align="center"
                 style={conditions(
@@ -224,286 +241,164 @@ function generateTable(parentFuses, childFuses) {
   );
 }
 
+function generateCheckbox(
+  index,
+  color,
+  label,
+  fuses,
+  changeCallback,
+  disabled = false
+) {
+  return (
+    <Checkbox
+      key={`checkbox-${index}`}
+      color={color}
+      label={label}
+      variant="switch"
+      disabled={disabled}
+      defaultChecked={fuses.has(label)}
+      onChange={(e) =>
+        changeCallback((previousState) =>
+          e.target.checked
+            ? new Set(previousState).add(label)
+            : new Set([...previousState].filter((x) => x !== label))
+        )
+      }
+    />
+  );
+}
+
 const App = () => {
-  const [parentFuses, setParentFuses] = useState(new Set());
+  const [parentFuses, setParentFuses] = useState(
+    new Set(['PARENT_CANNOT_CONTROL', 'CANNOT_UNWRAP'])
+  );
   const [childFuses, setChildFuses] = useState(new Set());
-  const {
-    CANNOT_BURN_FUSES,
-    CANNOT_CREATE_SUBDOMAIN,
-    CANNOT_SET_RESOLVER,
-    CANNOT_TRANSFER,
-    CANNOT_SET_TTL,
-    CANNOT_UNWRAP,
-    PARENT_CANNOT_CONTROL,
-  } = fusesDict;
+  const [interactiveView, toggleInteractiveView] = useState(true);
+
+  const scrollPosition = useScrollPosition();
+  console.log(scrollPosition);
+
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   return (
     <ThemeProvider theme={lightTheme}>
       <ThorinGlobalStyles />
       <Container>
-        <Grid>
-          <Card padding="4" shadow>
-            <Heading>Fuse Book</Heading>
-            <Typography>Interactive Fuse Guide for NameWrapepr</Typography>
-            <InnerContainer>
-              <FieldSet legend="ens.eth">
-                <pre>
-                  State: [{new Array(...parentFuses).join(' | ').toString()}]
-                </pre>
-                <Checkbox
-                  color="red"
-                  label={PARENT_CANNOT_CONTROL}
-                  variant="switch"
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== PARENT_CANNOT_CONTROL
-                            )
-                          )
-                    )
-                  }
+        {interactiveView ? (
+          <>
+            <div className="fuseLogo">
+              <h1>Fuse Book</h1>
+              <div>Interactive Fuse Guide for NameWrapper</div>
+            </div>
+            <div
+              className="changeViewButton"
+              onClick={() => toggleInteractiveView((prev) => !prev)}
+            >
+              Switch to Table view
+            </div>
+            <Panel>
+              <Rail>
+                <InteractiveView
+                  name="ens.eth"
+                  fusesDict={fusesDict}
+                  parentFuses={parentFuses}
+                  childFuses={childFuses}
+                  setFuses={setParentFuses}
+                  checkParent={checkParent}
+                  checkSelf={checkSelf}
+                  scrollPosition={scrollPosition}
                 />
-                <Checkbox
-                  color="yellow"
-                  label={CANNOT_UNWRAP}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_UNWRAP)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_UNWRAP)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_UNWRAP
-                            )
-                          )
-                    )
-                  }
+              </Rail>
+              <Rail style={{ height: '700px' }}>
+                <InteractiveView
+                  name="sub1.ens.eth"
+                  fusesDict={fusesDict}
+                  parentFuses={parentFuses}
+                  childFuses={childFuses}
+                  setFuses={setChildFuses}
+                  checkParent={checkParent}
+                  checkSelf={checkSelf}
                 />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_SET_RESOLVER}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_SET_RESOLVER)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_SET_RESOLVER)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_SET_RESOLVER
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_SET_TTL}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_SET_TTL)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_SET_TTL)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_SET_TTL
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_TRANSFER}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_TRANSFER)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_TRANSFER)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_TRANSFER
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_CREATE_SUBDOMAIN}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_CREATE_SUBDOMAIN)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_CREATE_SUBDOMAIN
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_BURN_FUSES}
-                  variant="switch"
-                  disabled={!checkSelf(parentFuses, CANNOT_BURN_FUSES)}
-                  onChange={(e) =>
-                    setParentFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_BURN_FUSES
-                            )
-                          )
-                    )
-                  }
-                />
-              </FieldSet>
-            </InnerContainer>
+              </Rail>
+            </Panel>
+          </>
+        ) : (
+          <Grid>
+            <Card padding="4" shadow>
+              <Heading>Fuse Book</Heading>
+              <Typography>Interactive Fuse Guide for NameWrapper</Typography>
+              <InnerContainer>
+                <FieldSet legend="ens.eth">
+                  <pre>
+                    State: [{new Array(...parentFuses).join(' | ').toString()}]
+                  </pre>
+                  {Object.values(fusesDict)
+                    .reverse()
+                    .map((fuse, index) =>
+                      generateCheckbox(
+                        index,
+                        fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
+                        fuse,
+                        parentFuses,
+                        setParentFuses,
+                        fuse === PARENT_CANNOT_CONTROL
+                          ? false
+                          : !checkSelf(parentFuses, fuse)
+                      )
+                    )}
+                </FieldSet>
+              </InnerContainer>
 
-            <InnerContainer>
-              <FieldSet legend="sub.ens.eth">
-                <pre>
-                  State: [{new Array(...childFuses).join(' | ').toString()}]
-                </pre>
-                <Checkbox
-                  color="red"
-                  label={PARENT_CANNOT_CONTROL}
-                  variant="switch"
-                  disabled={!checkParent(parentFuses, PARENT_CANNOT_CONTROL)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(PARENT_CANNOT_CONTROL)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== PARENT_CANNOT_CONTROL
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="yellow"
-                  label={CANNOT_UNWRAP}
-                  disabled={!checkSelf(childFuses, CANNOT_UNWRAP)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_UNWRAP)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_UNWRAP
-                            )
-                          )
-                    )
-                  }
-                  variant="switch"
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_CREATE_SUBDOMAIN}
-                  disabled={!checkSelf(childFuses, CANNOT_CREATE_SUBDOMAIN)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_CREATE_SUBDOMAIN)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_CREATE_SUBDOMAIN
-                            )
-                          )
-                    )
-                  }
-                  variant="switch"
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_SET_RESOLVER}
-                  variant="switch"
-                  disabled={!checkSelf(childFuses, CANNOT_SET_RESOLVER)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_SET_RESOLVER)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_SET_RESOLVER
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_SET_TTL}
-                  variant="switch"
-                  disabled={!checkSelf(childFuses, CANNOT_SET_TTL)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_SET_TTL)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_SET_TTL
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_TRANSFER}
-                  variant="switch"
-                  disabled={!checkSelf(childFuses, CANNOT_TRANSFER)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_TRANSFER)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_TRANSFER
-                            )
-                          )
-                    )
-                  }
-                />
-                <Checkbox
-                  color="red"
-                  label={CANNOT_BURN_FUSES}
-                  disabled={!checkSelf(childFuses, CANNOT_BURN_FUSES)}
-                  onChange={(e) =>
-                    setChildFuses((previousState) =>
-                      e.target.checked
-                        ? new Set(previousState).add(CANNOT_BURN_FUSES)
-                        : new Set(
-                            [...previousState].filter(
-                              (x) => x !== CANNOT_BURN_FUSES
-                            )
-                          )
-                    )
-                  }
-                  variant="switch"
-                />
-              </FieldSet>
-            </InnerContainer>
-          </Card>
-          <div className="tableContainer">
-            {generateTable(parentFuses, childFuses)}
-          </div>
-        </Grid>
+              <InnerContainer>
+                <FieldSet legend="sub.ens.eth">
+                  <pre>
+                    State: [{new Array(...childFuses).join(' | ').toString()}]
+                  </pre>
+                  {Object.values(fusesDict)
+                    .reverse()
+                    .map((fuse, index) =>
+                      generateCheckbox(
+                        index + 10, // different indexes than parent
+                        fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
+                        fuse,
+                        childFuses,
+                        setChildFuses,
+                        fuse === PARENT_CANNOT_CONTROL
+                          ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
+                          : !checkSelf(childFuses, fuse)
+                      )
+                    )}
+                </FieldSet>
+              </InnerContainer>
+            </Card>
+            <div className="tableContainer">
+              <div
+                className="changeViewButton"
+                onClick={() => toggleInteractiveView((prev) => !prev)}
+              >
+                Switch to Interactive view
+              </div>
+              {generateTable(parentFuses, childFuses)}
+            </div>
+          </Grid>
+        )}
       </Container>
     </ThemeProvider>
   );
+};
+
+const useScrollPosition = () => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      setScrollPosition(window.pageYOffset);
+    };
+    window.addEventListener('scroll', updatePosition);
+    updatePosition();
+    return () => window.removeEventListener('scroll', updatePosition);
+  }, []);
+
+  return scrollPosition;
 };
 
 export default App;

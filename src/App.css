@@ -50,3 +50,246 @@ pre {
 .tableContainer {
   width: 100%;
 }
+
+.changeViewButton {
+  text-align: right;
+  font-weight: 600;
+  padding-right: 2px;
+  cursor: pointer;
+}
+
+div[class^='grid'] {
+  transition: .5s background-color;
+}
+
+.fuseLogo {
+  position: absolute;
+  line-height: 2.1rem;
+}
+
+.fuseLogo h1 {
+  font-size: 21pt;
+  margin: 0;
+}
+
+.grid-pf {
+  grid-area: pf;
+  background-color: white;
+  border-radius: 10px;
+
+  display: grid;
+  padding: 10px;
+}
+
+.header-pf {
+  height: 30%;
+}
+
+.fuses-pf {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 1fr 3fr;
+  gap: 20px;
+  padding: 10px;
+  text-align: center;
+}
+
+.grid-img {
+  grid-area: img;
+  background-color: white;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+}
+
+.grid-base {
+  grid-area: base;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 240px;
+}
+
+.grid-base img {
+  border-radius: 10px;
+  height: 200px;
+}
+
+.grid-ocf {
+  grid-area: ocf;
+  background-color: white;
+  border-radius: 10px;
+
+  display: grid;
+  height: 100%;
+  padding: 10px;
+}
+
+.header-ocf {
+  text-align: right;
+  height: 30%;
+}
+
+.fuses-ocf {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+  padding: 10px;
+  text-align: center;
+}
+
+.grid-sec {
+  grid-area: sec;
+  background-color: white;
+  padding: 10px 10px 0 10px;
+  border-radius: 10px;
+
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.grid-sub {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  text-align: center;
+  gap: 30px;
+}
+
+.grid-sub-item {
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+  border-width: 0 5px 5px 5px;
+  border-style: solid solid solid solid;
+  border-color: rgb(82, 115, 199);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.emphasis {
+  width: 70px;
+  font-size: 30pt;
+  line-height: 1.2em;
+  text-align: center;
+}
+
+.fuse-switch{
+  margin: 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 2px solid #ccc;
+  overflow: hidden;
+  font-size: 7pt;
+  width: 60px;
+}
+
+.fuse-switch label {
+  float: left; 
+  width: 6.0em;
+  height: 6.0em;
+  word-wrap: break-word;
+  cursor: pointer;
+  user-select: none;
+}
+
+.fuse-switch.disabled {
+  background-color: gray;
+}
+
+.fuse-switch.disabled label span {
+  color: white;
+}
+
+.fuse-switch label span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3px 0;
+  height: 6.0em;
+}
+
+.fuse-switch label input {
+  position: absolute;
+  display: none;
+  color: #fff !important;
+}
+/* selects all of the text within the input element and changes the color of the text */
+.fuse-switch label input + span{color: #000;}
+
+
+/* This will declare how a selected input will look giving generic properties */
+.fuse-switch input:checked + span {
+    color: #ffffff;
+    text-shadow: 0 0  6px rgba(0, 0, 0, 0.8);
+}
+
+.yellow input:checked + span{background-color: rgb(255,204,0);}
+.red input:checked + span{background-color: rgb(213, 85, 85);}
+
+.box-green { background-color: rgb(101, 178, 155); }
+.box-red { background-color: rgb(214, 112, 112); }
+
+.interactiveIntro {
+  position: fixed;
+  margin-left: -420px;
+}
+
+.interactiveIntro span {
+  display: inline-block;
+  width: 300px;
+  font-weight: bold;
+  font-size: 21pt;
+  white-space: break-spaces;
+}
+
+.textInfo {
+  min-width: 700px;
+  margin: 30px 20%;
+  font-size: 21pt;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2.5rem;
+}
+
+.glowing{
+  animation: glower 5s linear infinite;
+  font-weight: bold;
+}
+
+@keyframes glower {
+  0% {
+    filter: saturate(100);
+  }
+  
+  20% {
+    filter: saturate(0);
+  }
+  
+  40% {
+    filter: saturate(100);
+  }
+
+  20% {
+    filter: saturate(0);
+  }
+  
+  60% {
+    filter: saturate(100);
+  }
+
+  80% {
+    filter: saturate(0);
+  }
+  
+  100% {
+    filter: saturate(100);
+  }
+}
