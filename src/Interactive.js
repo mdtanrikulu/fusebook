@@ -12,7 +12,17 @@ const PHASE_4_Y_POS = 3000;
 const PHASE_5_Y_POS = 4000;
 
 const BACKGROUND_RED = { backgroundColor: 'rgb(214, 112, 112)' };
-const BACKGROUND_GREEN =  { backgroundColor: 'rgb(73, 179, 147)' };
+const BACKGROUND_GREEN = { backgroundColor: 'rgb(73, 179, 147)' };
+
+const labelDict = {
+  CANNOT_BURN_FUSES: 'Cannot Burn Fuses',
+  CANNOT_CREATE_SUBDOMAIN: 'Create Subdomain',
+  CANNOT_TRANSFER: 'Transfer',
+  CANNOT_SET_RESOLVER: 'Set Resolver',
+  CANNOT_SET_TTL: 'Set TTL',
+  CANNOT_UNWRAP: 'Cannot Unwrap',
+  PARENT_CANNOT_CONTROL: 'Parent Cannot Control',
+};
 
 const InteractiveGrid = styled.div(
   () => css`
@@ -38,15 +48,18 @@ function generateCheckbox(
   label,
   fuses,
   changeCallback,
-  disabled = false
+  disabled = false,
+  isSubname = false
 ) {
   return (
     <div
       key={`checkbox-${index}`}
+      id={`fuseBox${!isSubname ? '2LD' : '3LD'}_${label}`}
       className={`fuse-switch ${disabled ? `disabled` : color}`}
     >
       <label>
         <input
+          id={`fuseBoxInput${!isSubname ? '2LD' : '3LD'}_${label}`}
           type="checkbox"
           value="1"
           disabled={disabled}
@@ -59,7 +72,7 @@ function generateCheckbox(
             )
           }
         />
-        <span>{label}</span>
+        <span>{labelDict[label]}</span>
       </label>
     </div>
   );
@@ -81,8 +94,7 @@ function setEmancipatedBackgroundState(fuses, fusesDict) {
     CANNOT_SET_TTL,
     PARENT_CANNOT_CONTROL,
   } = fusesDict;
-  if (!fuses.has(PARENT_CANNOT_CONTROL))
-    return BACKGROUND_RED;
+  if (!fuses.has(PARENT_CANNOT_CONTROL)) return BACKGROUND_RED;
   if (
     fuses.has(CANNOT_BURN_FUSES) &&
     fuses.has(CANNOT_CREATE_SUBDOMAIN) &&
@@ -117,6 +129,8 @@ function setOCBackgroundState(fuses, fusesDict) {
   return BACKGROUND_GREEN;
 }
 
+let fuseBurned = false;
+
 export default function InteractiveView({
   name,
   fusesDict,
@@ -126,6 +140,7 @@ export default function InteractiveView({
   checkParent,
   checkSelf,
   scrollPosition,
+  handleSubdomainCreation = () => {},
 }) {
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   const isSubname = name.split('.').length > 2;
@@ -140,18 +155,27 @@ export default function InteractiveView({
 
     if (scrollPosition < PHASE_INTRO_Y_POS) {
       intro.style.display = 'block';
+      fuseBurned = false;
     } else if (scrollPosition >= PHASE_INTRO_Y_POS) {
       intro.style.display = 'none';
       createSub.classList.remove('glowing');
+      createSub.innerHTML = '<span>Sub 1 fuses</span>';
+      const buttonCS = document.getElementById('buttonCS');
+      if (buttonCS) {
+        createSub.removeChild(buttonCS);
+      }
     }
 
-    if (scrollPosition < PHASE_BASE_Y_POS && base.style.position == '') {
+    if (scrollPosition < PHASE_BASE_Y_POS && base.style.position === '') {
       base.style.position = 'fixed';
       base.style.top = `${PHASE_INTRO_Y_POS}px`;
       base.style.display = 'flex';
       wrapper.style = null;
       textInfo.innerText = '';
-    } else if (scrollPosition >= PHASE_BASE_Y_POS && base.style.position == 'fixed') {
+    } else if (
+      scrollPosition >= PHASE_BASE_Y_POS &&
+      base.style.position === 'fixed'
+    ) {
       base.style = null;
       wrapper.style.position = 'sticky';
       wrapper.style.top = '85px';
@@ -160,13 +184,32 @@ export default function InteractiveView({
     if (scrollPosition > PHASE_2_Y_POS && scrollPosition <= PHASE_3_Y_POS) {
       textInfo.innerText =
         'You can now create new ERC-1155 compliant sub-domains.';
-    } else if (scrollPosition > PHASE_3_Y_POS && scrollPosition <= PHASE_4_Y_POS) {
+    } else if (
+      scrollPosition > PHASE_3_Y_POS &&
+      scrollPosition <= PHASE_4_Y_POS
+    ) {
       textInfo.innerText = 'And use fuses on both names!';
-    } else if (scrollPosition > PHASE_4_Y_POS && scrollPosition <= PHASE_5_Y_POS) {
+    } else if (
+      scrollPosition > PHASE_4_Y_POS &&
+      scrollPosition <= PHASE_5_Y_POS
+    ) {
       textInfo.innerText = 'Lets create a subdomain as an NFT!';
       createSub.classList.add('glowing');
     } else if (scrollPosition > PHASE_5_Y_POS) {
       textInfo.innerText = '';
+      if (!fuseBurned) {
+        createSub.innerText = '';
+        const buttonCS = document.createElement('button');
+        buttonCS.id = 'buttonCS';
+        buttonCS.classList.add('button-cs');
+        buttonCS.onclick = () => { 
+          fuseBurned = true;
+          handleSubdomainCreation();
+        }
+        buttonCS.textContent = 'Create subdomain';
+
+        createSub.appendChild(buttonCS);
+      }
     } else if (scrollPosition > PHASE_1_Y_POS) {
       textInfo.innerText =
         'Your ERC-721 compliant ENS domain becomes an ERC-1155 compliant by wrapping!';
@@ -174,7 +217,10 @@ export default function InteractiveView({
   }, [scrollPosition]);
 
   return (
-    <div id={`wrapper${!isSubname ? '2LD' : '3LD'}`}>
+    <div
+      id={`wrapper${!isSubname ? '2LD' : '3LD'}`}
+      style={isSubname ? { zIndex: '1' } : {}}
+    >
       <InteractiveGrid>
         <div
           className="grid-pf"
@@ -202,7 +248,8 @@ export default function InteractiveView({
                       ? isSubname
                         ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                         : null
-                      : !checkSelf(isSubname ? childFuses : parentFuses, fuse)
+                      : !checkSelf(isSubname ? childFuses : parentFuses, fuse),
+                    isSubname
                   )
                 )}
             </div>
@@ -239,7 +286,7 @@ export default function InteractiveView({
                   This is your ERC-721 compliant ENS name. Let's wrap it
                   scrolling!
                 </span>
-                <img src={arrowImg} width="100px" />
+                <img src={arrowImg} alt="erc-721" width="100px" />
               </div>
             )}
             <img
@@ -258,7 +305,7 @@ export default function InteractiveView({
           )}
         >
           <div className="header-ocf">
-            <h1></h1>
+            <div></div>
           </div>
           <div className="fuses-ocf">
             <div>
@@ -282,7 +329,8 @@ export default function InteractiveView({
                       : !checkSelf(
                           name.split('.').length > 2 ? childFuses : parentFuses,
                           fuse
-                        )
+                        ),
+                    isSubname
                   )
                 )}
             </div>
@@ -300,14 +348,18 @@ export default function InteractiveView({
           </div>
           <div>
             <div className="grid-sub">
-              <div className="grid-sub-item">Sub 2 fuses</div>
+              <div className="grid-sub-item">
+                <span>Sub 2 fuses</span>
+              </div>
               <div
                 id={`createSub${isSubname ? '2' : '1'}`}
                 className="grid-sub-item"
               >
-                Sub 1 fuses
+                <span>Sub 1 fuses</span>
               </div>
-              <div className="grid-sub-item">Sub 3 fuses</div>
+              <div className="grid-sub-item">
+                <span>Sub 3 fuses</span>
+              </div>
             </div>
           </div>
         </div>

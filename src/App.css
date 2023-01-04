@@ -1,14 +1,16 @@
-table, th, td {
+table,
+th,
+td {
   border: 2px solid rgb(232, 231, 231);
   border-collapse: collapse;
-  table-layout:fixed;
+  table-layout: fixed;
   border-radius: 5px;
 }
 
-
-td, th {
+td,
+th {
   padding: 10px 0;
-  transition: .5s background-color;
+  transition: 0.5s background-color;
 }
 
 table {
@@ -16,7 +18,7 @@ table {
   top: calc(20vh - 50px);
   border-radius: 5px;
   border-style: hidden; /* hide standard table (collapsed) border */
-  box-shadow: 0 0 0 2px rgb(232, 231, 231); /* this draws the table border  */ 
+  box-shadow: 0 0 0 2px rgb(232, 231, 231); /* this draws the table border  */
 }
 
 th {
@@ -59,7 +61,7 @@ pre {
 }
 
 div[class^='grid'] {
-  transition: .5s background-color;
+  transition: 0.5s background-color;
 }
 
 .fuseLogo {
@@ -165,12 +167,17 @@ div[class^='grid'] {
 .grid-sub-item {
   width: 100%;
   height: 100%;
-  padding: 30px;
   border-width: 0 5px 5px 5px;
   border-style: solid solid solid solid;
   border-color: rgb(82, 115, 199);
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  transition: 0.5s all ease;
+}
+
+.grid-sub-item span {
+  display: inline-block;
+  padding: 30px;
 }
 
 .emphasis {
@@ -180,7 +187,7 @@ div[class^='grid'] {
   text-align: center;
 }
 
-.fuse-switch{
+.fuse-switch {
   margin: 4px;
   background-color: #fff;
   border-radius: 4px;
@@ -191,9 +198,9 @@ div[class^='grid'] {
 }
 
 .fuse-switch label {
-  float: left; 
-  width: 6.0em;
-  height: 6.0em;
+  float: left;
+  width: 6em;
+  height: 6em;
   word-wrap: break-word;
   cursor: pointer;
   user-select: none;
@@ -213,7 +220,7 @@ div[class^='grid'] {
   justify-content: center;
   text-align: center;
   padding: 3px 0;
-  height: 6.0em;
+  height: 6em;
 }
 
 .fuse-switch label input {
@@ -222,20 +229,29 @@ div[class^='grid'] {
   color: #fff !important;
 }
 /* selects all of the text within the input element and changes the color of the text */
-.fuse-switch label input + span{color: #000;}
-
+.fuse-switch label input + span {
+  color: #000;
+}
 
 /* This will declare how a selected input will look giving generic properties */
 .fuse-switch input:checked + span {
-    color: #ffffff;
-    text-shadow: 0 0  6px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
 }
 
-.yellow input:checked + span{background-color: rgb(255,204,0);}
-.red input:checked + span{background-color: rgb(213, 85, 85);}
+.yellow input:checked + span {
+  background-color: rgb(255, 204, 0);
+}
+.red input:checked + span {
+  background-color: rgb(213, 85, 85);
+}
 
-.box-green { background-color: rgb(101, 178, 155); }
-.box-red { background-color: rgb(214, 112, 112); }
+.box-green {
+  background-color: rgb(101, 178, 155);
+}
+.box-red {
+  background-color: rgb(214, 112, 112);
+}
 
 .interactiveIntro {
   position: fixed;
@@ -259,7 +275,7 @@ div[class^='grid'] {
   line-height: 2.5rem;
 }
 
-.glowing{
+.glowing {
   animation: glower 5s linear infinite;
   font-weight: bold;
 }
@@ -268,11 +284,11 @@ div[class^='grid'] {
   0% {
     filter: saturate(100);
   }
-  
+
   20% {
     filter: saturate(0);
   }
-  
+
   40% {
     filter: saturate(100);
   }
@@ -280,7 +296,7 @@ div[class^='grid'] {
   20% {
     filter: saturate(0);
   }
-  
+
   60% {
     filter: saturate(100);
   }
@@ -288,8 +304,54 @@ div[class^='grid'] {
   80% {
     filter: saturate(0);
   }
-  
+
   100% {
     filter: saturate(100);
+  }
+}
+
+.path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+  animation: dash 2s linear forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.button-cs {
+  position: relative;
+  -moz-box-align: center;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  -moz-box-pack: center;
+  justify-content: center;
+  transition-property: all;
+  gap: 1rem;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+  letter-spacing: -0.01em;
+  width: 90%;
+  margin: auto;
+  box-shadow: none !important;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  padding: 0.875rem 1rem;
+  color: rgb(255, 255, 255);
+  background: rgb(56, 136, 255);
+  top: -15px;
+  animation: press 1s ease-out infinite;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:32px;'><text y='50%'>🔥</text></svg>")
+      16 0,
+    auto;
+}
+
+@keyframes press {
+  to {
+    background-color: rgb(21, 60, 120);
   }
 }

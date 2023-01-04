@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import styled, { css, ThemeProvider } from 'styled-components';
 import {
   ThorinGlobalStyles,
@@ -12,6 +12,8 @@ import {
 } from '@ensdomains/thorin';
 import InteractiveView from './Interactive';
 import './App.css';
+
+const PHASE_5_Y_POS = 4000;
 
 const Grid = styled.div(
   () => css`
@@ -268,6 +270,111 @@ function generateCheckbox(
   );
 }
 
+function createArrow(_fuse, index, windowWidth, isPCC = false) {
+  const arrowEndWidth = isPCC
+    ? (windowWidth + 600) / 5.2
+    : (windowWidth - 200) / 1.25;
+  const arrowEndHeight = isPCC ? 450 : 216 + 64 * index;
+  const arrowStartHeight = 70 + 10 * index;
+  const arrowStartWidth = isPCC
+    ? windowWidth / 2.3
+    : (windowWidth - 100) / 1.72 - 10 * index;
+  return (
+    <svg
+      style={{ position: 'absolute', marginTop: '-150px', zIndex: 2 }}
+      width="100%"
+      height="100%"
+    >
+      <defs>
+        <marker
+          id="triangle"
+          viewBox="0 0 10 10"
+          refX="1"
+          refY="5"
+          markerUnits="strokeWidth"
+          markerWidth="5"
+          markerHeight="5"
+          orient="auto"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+        </marker>
+      </defs>
+      <polyline
+        className="path"
+        fill="none"
+        stroke="black"
+        strokeWidth={3}
+        points={`${arrowStartWidth},0 
+        ${arrowStartWidth},${arrowStartHeight} 
+        ${
+          isPCC ? arrowEndWidth + 40 : arrowEndWidth - (40 + 10 * index)
+        },${arrowStartHeight} ${
+          isPCC ? arrowEndWidth + 40 : arrowEndWidth - (40 + 10 * index)
+        },${arrowEndHeight} ${arrowEndWidth}, ${arrowEndHeight}`}
+        markerEnd="url(#triangle)"
+      />
+    </svg>
+  );
+}
+
+function createAnchor(windowWidth) {
+  const arrowEndWidth = (windowWidth - 10) / 2.8;
+  const arrowEndHeight = 240;
+  const arrowStartHeight = 120;
+  const arrowStartWidth = windowWidth / 2.2;
+  return (
+    <svg
+      style={{ position: 'absolute', marginTop: '-190px', zIndex: 2 }}
+      width="100%"
+      height="100%"
+    >
+      <defs>
+        <marker
+          id="anchorMarker"
+          viewBox="0 0 300 250"
+          refX="128"
+          refY="40"
+          markerUnits="strokeWidth"
+          markerWidth="20"
+          markerHeight="20"
+          orient="down"
+        >
+          <path
+            fill="grey"
+            stroke="#909090"
+            strokeWidth="2"
+            d="M216,136a8.00039,8.00039,0,0,0-8,8,40.04584,40.04584,0,0,1-40,40,47.79539,47.79539,0,0,0-32,12.27148V120h32a8,8,0,0,0,0-16H136V78.8291a28,28,0,1,0-16,0V104H88a8,8,0,0,0,0,16h32v76.27148A47.79539,47.79539,0,0,0,88,184a40.04584,40.04584,0,0,1-40-40,8,8,0,0,0-16,0,56.0629,56.0629,0,0,0,56,56,32.03667,32.03667,0,0,1,32,32,8,8,0,0,0,16,0,32.03667,32.03667,0,0,1,32-32,56.0629,56.0629,0,0,0,56-56A8.00039,8.00039,0,0,0,216,136ZM116,52a12,12,0,1,1,12,12A12.01312,12.01312,0,0,1,116,52Z"
+          />
+        </marker>
+      </defs>
+      <polyline
+        fill="none"
+        stroke="brown"
+        strokeWidth={6}
+        points={`${arrowStartWidth},40 
+    ${arrowStartWidth},${arrowStartHeight} 
+    ${arrowEndWidth},${arrowStartHeight} 
+    ${arrowEndWidth},${arrowEndHeight}`}
+        markerEnd="url(#anchorMarker)"
+      />
+    </svg>
+  );
+}
+
+function createArrows(windowWidth) {
+  return (
+    <div id="fuseArrows" style={{ pointerEvents: 'none' }}>
+      {Object.values(fusesDict)
+        .slice(0, 1)
+        .map((fuse, index) => createArrow(fuse, index, windowWidth, true))}
+      {createAnchor(windowWidth)}
+      {Object.values(fusesDict)
+        .slice(1)
+        .map((fuse, index) => createArrow(fuse, index, windowWidth))}
+    </div>
+  );
+}
+
 const App = () => {
   const [parentFuses, setParentFuses] = useState(
     new Set(['PARENT_CANNOT_CONTROL', 'CANNOT_UNWRAP'])
@@ -276,7 +383,48 @@ const App = () => {
   const [interactiveView, toggleInteractiveView] = useState(true);
 
   const scrollPosition = useScrollPosition();
-  console.log(scrollPosition);
+  const [width, _height] = useWindowSize();
+
+  if (scrollPosition < PHASE_5_Y_POS) {
+    const fuseArrows = document.getElementById('fuseArrows');
+    if (fuseArrows) {
+      const polylines = fuseArrows.getElementsByTagName('polyline');
+      Array.from(polylines).forEach((polyline) =>
+        polyline.classList.remove('path')
+      );
+    }
+  }
+
+  const handleSubdomainCreation = () => {
+    const fuseArrows = document.getElementById('fuseArrows');
+    if (fuseArrows) {
+      const polylines = fuseArrows.getElementsByTagName('polyline');
+      Array.from(polylines).forEach((polyline) =>
+        polyline.classList.add('path')
+      );
+      const createSub = document.getElementById('createSub1');
+      const buttonCS = document.getElementById('buttonCS');
+      if (buttonCS) {
+        createSub.removeChild(buttonCS);
+        createSub.innerHTML = '<span>Sub 1 fuses</span>';
+      }
+
+      Object.values(fusesDict)
+        .reverse()
+        .map((fuse) => {
+          if (
+            fuse === fusesDict.PARENT_CANNOT_CONTROL ||
+            fuse === fusesDict.CANNOT_UNWRAP ||
+            fuse === fusesDict.CANNOT_SET_RESOLVER
+          ) {
+            const fuseBox = document.getElementById(`fuseBoxInput3LD_${fuse}`);
+            fuseBox.disabled = false;
+            fuseBox.checked = true;
+            childFuses.add(fuse);
+          }
+        });
+    }
+  };
 
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   return (
@@ -306,8 +454,10 @@ const App = () => {
                   checkParent={checkParent}
                   checkSelf={checkSelf}
                   scrollPosition={scrollPosition}
+                  handleSubdomainCreation={handleSubdomainCreation}
                 />
               </Rail>
+              {createArrows(width)}
               <Rail style={{ height: '700px' }}>
                 <InteractiveView
                   name="sub1.ens.eth"
@@ -319,6 +469,10 @@ const App = () => {
                   checkSelf={checkSelf}
                 />
               </Rail>
+              <footer className="source">
+                <a href="https://twitter.com/md_tanrikulu">@tanrikulu.eth</a> -{' '}
+                <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
+              </footer>
             </Panel>
           </>
         ) : (
@@ -379,6 +533,10 @@ const App = () => {
               </div>
               {generateTable(parentFuses, childFuses)}
             </div>
+            <footer className="source">
+              <a href="https://twitter.com/md_tanrikulu">@tanrikulu.eth</a> -{' '}
+              <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
+            </footer>
           </Grid>
         )}
       </Container>
@@ -402,3 +560,16 @@ const useScrollPosition = () => {
 };
 
 export default App;
+
+function useWindowSize() {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+}
