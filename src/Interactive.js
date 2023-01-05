@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import Tippy from '@tippyjs/react';
 import matchboxIcon from './assets/matchbox.svg';
 import arrowImg from './assets/arrow.svg';
 
@@ -49,12 +50,13 @@ function generateCheckbox(
   fuses,
   changeCallback,
   disabled = false,
-  isSubname = false
+  isSubname = false,
+  nonce = ''
 ) {
   return (
     <div
       key={`checkbox-${index}`}
-      id={`fuseBox${!isSubname ? '2LD' : '3LD'}_${label}`}
+      id={`fuseBox${!isSubname ? '2LD' : '3LD'}_${label}${nonce}`}
       className={`fuse-switch ${disabled ? `disabled` : color}`}
     >
       <label>
@@ -63,6 +65,7 @@ function generateCheckbox(
           type="checkbox"
           value="1"
           disabled={disabled}
+          checked={fuses.has(label)}
           defaultChecked={fuses.has(label)}
           onChange={(e) =>
             changeCallback((previousState) =>
@@ -129,21 +132,23 @@ function setOCBackgroundState(fuses, fusesDict) {
   return BACKGROUND_GREEN;
 }
 
-let fuseBurned = false;
-
 export default function InteractiveView({
   name,
   fusesDict,
   parentFuses,
   childFuses,
-  setFuses,
+  setParentFuses,
+  setChildFuses,
   checkParent,
   checkSelf,
   scrollPosition,
+  fuseBurned,
+  setFuseBurned,
   handleSubdomainCreation = () => {},
 }) {
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   const isSubname = name.split('.').length > 2;
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
 
   useEffect(() => {
     if (!scrollPosition) return;
@@ -155,11 +160,11 @@ export default function InteractiveView({
 
     if (scrollPosition < PHASE_INTRO_Y_POS) {
       intro.style.display = 'block';
-      fuseBurned = false;
+      !!fuseBurned && setFuseBurned(false);
     } else if (scrollPosition >= PHASE_INTRO_Y_POS) {
       intro.style.display = 'none';
       createSub.classList.remove('glowing');
-      createSub.innerHTML = '<span>Sub 1 fuses</span>';
+      setTooltipVisible(false);
       const buttonCS = document.getElementById('buttonCS');
       if (buttonCS) {
         createSub.removeChild(buttonCS);
@@ -198,23 +203,17 @@ export default function InteractiveView({
     } else if (scrollPosition > PHASE_5_Y_POS) {
       textInfo.innerText = '';
       if (!fuseBurned) {
-        createSub.innerText = '';
-        const buttonCS = document.createElement('button');
-        buttonCS.id = 'buttonCS';
-        buttonCS.classList.add('button-cs');
-        buttonCS.onclick = () => { 
-          fuseBurned = true;
-          handleSubdomainCreation();
+        setTooltipVisible(true);
+        const tippy = document.querySelectorAll('[id^=tippy-]')[0];
+        if (tippy) {
+          tippy.style.width = '500px';
         }
-        buttonCS.textContent = 'Create subdomain';
-
-        createSub.appendChild(buttonCS);
       }
     } else if (scrollPosition > PHASE_1_Y_POS) {
       textInfo.innerText =
         'Your ERC-721 compliant ENS domain becomes an ERC-1155 compliant by wrapping!';
     }
-  }, [scrollPosition]);
+  }, [scrollPosition, fuseBurned, setFuseBurned]);
 
   return (
     <div
@@ -243,7 +242,7 @@ export default function InteractiveView({
                     fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
                     fuse,
                     isSubname ? childFuses : parentFuses,
-                    setFuses,
+                    isSubname ? setChildFuses : setParentFuses,
                     fuse === PARENT_CANNOT_CONTROL
                       ? isSubname
                         ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
@@ -321,7 +320,7 @@ export default function InteractiveView({
                     fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
                     fuse,
                     isSubname ? childFuses : parentFuses,
-                    setFuses,
+                    isSubname ? setChildFuses : setParentFuses,
                     fuse === PARENT_CANNOT_CONTROL
                       ? name.split('.').length > 2
                         ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
@@ -355,7 +354,52 @@ export default function InteractiveView({
                 id={`createSub${isSubname ? '2' : '1'}`}
                 className="grid-sub-item"
               >
-                <span>Sub 1 fuses</span>
+                <Tippy
+                  visible={isTooltipVisible}
+                  interactive={true}
+                  offset={[0, -34]}
+                  maxWidth="none"
+                  placement="top"
+                  popperOptions={{
+                    modifiers: [{ name: 'flip', enabled: false }],
+                  }}
+                  content={
+                    <div className="box" tabIndex="-1">
+                      <div style={{ margin: '10px 0' }}>
+                        Select fuses below to burn for your subdomain in
+                        creation
+                      </div>
+                      <div style={{ display: 'flex' }}>
+                        {Object.values(fusesDict)
+                          .reverse()
+                          .map((fuse, index) =>
+                            generateCheckbox(
+                              index + 10, // different indexes than parent
+                              fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
+                              fuse,
+                              childFuses,
+                              setChildFuses,
+                              false,
+                              true,
+                              `t${index}`
+                            )
+                          )}
+                      </div>
+                      <button
+                        className="button-cs"
+                        onClick={() => {
+                          handleSubdomainCreation();
+                          setFuseBurned(true);
+                          setTooltipVisible(false);
+                        }}
+                      >
+                        Create Subdomain
+                      </button>
+                    </div>
+                  }
+                >
+                  <span>Sub 1 fuses</span>
+                </Tippy>
               </div>
               <div className="grid-sub-item">
                 <span>Sub 3 fuses</span>

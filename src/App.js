@@ -7,7 +7,6 @@ import {
   FieldSet,
   Checkbox,
   Heading,
-  Toast,
   Typography,
 } from '@ensdomains/thorin';
 import InteractiveView from './Interactive';
@@ -95,7 +94,7 @@ function checkSelf(fuses, fuse) {
   }
   if (
     // user fuses
-    fuse == CANNOT_TRANSFER ||
+    fuse === CANNOT_TRANSFER ||
     fuse === CANNOT_SET_RESOLVER ||
     fuse === CANNOT_SET_TTL
   ) {
@@ -169,7 +168,7 @@ function generateTable(parentFuses, childFuses) {
       }
       return states[1];
     }
-    if (key === 'unwrap' || key == 'unwrapETH2LD') {
+    if (key === 'unwrap' || key === 'unwrapETH2LD') {
       if (fuses.has(CANNOT_UNWRAP)) {
         return states[2];
       }
@@ -340,7 +339,7 @@ function createAnchor(windowWidth) {
           orient="down"
         >
           <path
-            fill="grey"
+            fill="#adacac"
             stroke="#909090"
             strokeWidth="2"
             d="M216,136a8.00039,8.00039,0,0,0-8,8,40.04584,40.04584,0,0,1-40,40,47.79539,47.79539,0,0,0-32,12.27148V120h32a8,8,0,0,0,0-16H136V78.8291a28,28,0,1,0-16,0V104H88a8,8,0,0,0,0,16h32v76.27148A47.79539,47.79539,0,0,0,88,184a40.04584,40.04584,0,0,1-40-40,8,8,0,0,0-16,0,56.0629,56.0629,0,0,0,56,56,32.03667,32.03667,0,0,1,32,32,8,8,0,0,0,16,0,32.03667,32.03667,0,0,1,32-32,56.0629,56.0629,0,0,0,56-56A8.00039,8.00039,0,0,0,216,136ZM116,52a12,12,0,1,1,12,12A12.01312,12.01312,0,0,1,116,52Z"
@@ -381,9 +380,10 @@ const App = () => {
   );
   const [childFuses, setChildFuses] = useState(new Set());
   const [interactiveView, toggleInteractiveView] = useState(true);
+  const [fuseBurned, setFuseBurned] = useState(false);
 
   const scrollPosition = useScrollPosition();
-  const [width, _height] = useWindowSize();
+  const [width,] = useWindowSize();
 
   if (scrollPosition < PHASE_5_Y_POS) {
     const fuseArrows = document.getElementById('fuseArrows');
@@ -402,27 +402,6 @@ const App = () => {
       Array.from(polylines).forEach((polyline) =>
         polyline.classList.add('path')
       );
-      const createSub = document.getElementById('createSub1');
-      const buttonCS = document.getElementById('buttonCS');
-      if (buttonCS) {
-        createSub.removeChild(buttonCS);
-        createSub.innerHTML = '<span>Sub 1 fuses</span>';
-      }
-
-      Object.values(fusesDict)
-        .reverse()
-        .map((fuse) => {
-          if (
-            fuse === fusesDict.PARENT_CANNOT_CONTROL ||
-            fuse === fusesDict.CANNOT_UNWRAP ||
-            fuse === fusesDict.CANNOT_SET_RESOLVER
-          ) {
-            const fuseBox = document.getElementById(`fuseBoxInput3LD_${fuse}`);
-            fuseBox.disabled = false;
-            fuseBox.checked = true;
-            childFuses.add(fuse);
-          }
-        });
     }
   };
 
@@ -450,10 +429,13 @@ const App = () => {
                   fusesDict={fusesDict}
                   parentFuses={parentFuses}
                   childFuses={childFuses}
-                  setFuses={setParentFuses}
+                  setParentFuses={setParentFuses}
+                  setChildFuses={setChildFuses}
                   checkParent={checkParent}
                   checkSelf={checkSelf}
                   scrollPosition={scrollPosition}
+                  fuseBurned={fuseBurned}
+                  setFuseBurned={setFuseBurned}
                   handleSubdomainCreation={handleSubdomainCreation}
                 />
               </Rail>
@@ -464,9 +446,12 @@ const App = () => {
                   fusesDict={fusesDict}
                   parentFuses={parentFuses}
                   childFuses={childFuses}
-                  setFuses={setChildFuses}
+                  setParentFuses={setParentFuses}
+                  setChildFuses={setChildFuses}
                   checkParent={checkParent}
                   checkSelf={checkSelf}
+                  fuseBurned={fuseBurned}
+                  setFuseBurned={setFuseBurned}
                 />
               </Rail>
               <footer className="source">
@@ -487,7 +472,7 @@ const App = () => {
                   </pre>
                   {Object.values(fusesDict)
                     .reverse()
-                    .map((fuse, index) =>
+                    .forEach((fuse, index) =>
                       generateCheckbox(
                         index,
                         fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
