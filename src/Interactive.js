@@ -91,19 +91,11 @@ function setPCBackgroundState(fuses, fusesDict) {
 function setEmancipatedBackgroundState(fuses, fusesDict) {
   const {
     CANNOT_BURN_FUSES,
-    CANNOT_CREATE_SUBDOMAIN,
-    CANNOT_TRANSFER,
-    CANNOT_SET_RESOLVER,
-    CANNOT_SET_TTL,
     PARENT_CANNOT_CONTROL,
   } = fusesDict;
   if (!fuses.has(PARENT_CANNOT_CONTROL)) return BACKGROUND_RED;
   if (
-    fuses.has(CANNOT_BURN_FUSES) &&
-    fuses.has(CANNOT_CREATE_SUBDOMAIN) &&
-    fuses.has(CANNOT_TRANSFER) &&
-    fuses.has(CANNOT_SET_RESOLVER) &&
-    fuses.has(CANNOT_SET_TTL)
+    fuses.has(CANNOT_BURN_FUSES)
   )
     return BACKGROUND_RED;
   return BACKGROUND_GREEN;
@@ -112,21 +104,13 @@ function setEmancipatedBackgroundState(fuses, fusesDict) {
 function setOCBackgroundState(fuses, fusesDict) {
   const {
     CANNOT_BURN_FUSES,
-    CANNOT_CREATE_SUBDOMAIN,
-    CANNOT_TRANSFER,
-    CANNOT_SET_RESOLVER,
-    CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
   } = fusesDict;
   if (!fuses.has(CANNOT_UNWRAP) || !fuses.has(PARENT_CANNOT_CONTROL))
     return BACKGROUND_RED;
   if (
-    fuses.has(CANNOT_BURN_FUSES) &&
-    fuses.has(CANNOT_CREATE_SUBDOMAIN) &&
-    fuses.has(CANNOT_TRANSFER) &&
-    fuses.has(CANNOT_SET_RESOLVER) &&
-    fuses.has(CANNOT_SET_TTL)
+    fuses.has(CANNOT_BURN_FUSES)
   )
     return BACKGROUND_RED;
   return BACKGROUND_GREEN;

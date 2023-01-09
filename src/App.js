@@ -9,10 +9,61 @@ import {
   Heading,
   Typography,
 } from '@ensdomains/thorin';
+import Highlight, { defaultProps } from 'prism-react-renderer';
+import theme from 'prism-react-renderer/themes/nightOwl';
 import InteractiveView from './Interactive';
 import './App.css';
 
 const PHASE_5_Y_POS = 4000;
+
+const jsCode = `
+NameWrapper.setSubnodeRecord(
+  wrappedTokenId,
+  'sub',
+  account,
+  resolver,
+  0,
+  0,
+  0,
+)
+`.trim();
+
+const solidityCode = `
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.10;
+
+import "hardhat/console.sol";
+contract Example {
+  constructor() public {
+    console.log('this is an example')
+  }
+}
+`.trim();
+
+const Pre = styled.pre`
+  height: 100%;
+  text-align: left;
+  padding: 0.5em;
+  font-size: 14pt;
+  line-height: 1.5rem;
+  overflow: scroll;
+`;
+
+const Line = styled.div`
+  display: table-row;
+`;
+
+const LineNo = styled.span`
+  display: table-cell;
+  text-align: right;
+  padding-right: 1em;
+  user-select: none;
+  opacity: 0.5;
+`;
+
+const LineContent = styled.span`
+  display: table-cell;
+`;
 
 const Grid = styled.div(
   () => css`
@@ -269,7 +320,11 @@ function generateCheckbox(
   );
 }
 
-function createArrow(_fuse, index, windowWidth, isPCC = false) {
+function createArrow(fuse, index, windowWidth, isPCC = false) {
+  windowWidth =
+    windowWidth < 1250
+      ? windowWidth + ((1250 - windowWidth) * 550) / windowWidth
+      : windowWidth;
   const arrowEndWidth = isPCC
     ? (windowWidth + 600) / 5.2
     : (windowWidth - 200) / 1.25;
@@ -299,6 +354,7 @@ function createArrow(_fuse, index, windowWidth, isPCC = false) {
         </marker>
       </defs>
       <polyline
+        id={`pl_${fuse}`}
         className="path"
         fill="none"
         stroke="black"
@@ -317,6 +373,10 @@ function createArrow(_fuse, index, windowWidth, isPCC = false) {
 }
 
 function createAnchor(windowWidth) {
+  windowWidth =
+    windowWidth < 1250
+      ? windowWidth + ((1250 - windowWidth) * 550) / windowWidth
+      : windowWidth;
   const arrowEndWidth = (windowWidth - 10) / 2.8;
   const arrowEndHeight = 240;
   const arrowStartHeight = 120;
@@ -364,10 +424,12 @@ function createArrows(windowWidth) {
   return (
     <div id="fuseArrows" style={{ pointerEvents: 'none' }}>
       {Object.values(fusesDict)
+        .reverse()
         .slice(0, 1)
         .map((fuse, index) => createArrow(fuse, index, windowWidth, true))}
       {createAnchor(windowWidth)}
       {Object.values(fusesDict)
+        .reverse()
         .slice(1)
         .map((fuse, index) => createArrow(fuse, index, windowWidth))}
     </div>
@@ -383,7 +445,7 @@ const App = () => {
   const [fuseBurned, setFuseBurned] = useState(false);
 
   const scrollPosition = useScrollPosition();
-  const [width,] = useWindowSize();
+  const [width] = useWindowSize();
 
   if (scrollPosition < PHASE_5_Y_POS) {
     const fuseArrows = document.getElementById('fuseArrows');
@@ -399,11 +461,36 @@ const App = () => {
     const fuseArrows = document.getElementById('fuseArrows');
     if (fuseArrows) {
       const polylines = fuseArrows.getElementsByTagName('polyline');
-      Array.from(polylines).forEach((polyline) =>
-        polyline.classList.add('path')
-      );
+      Array.from(polylines).forEach((polyline) => {
+        if (childFuses.has(fusesDict.PARENT_CANNOT_CONTROL)) {
+          polyline.classList.add('path');
+        } else if (childFuses.has(polyline.id.replace('pl_', ''))) {
+          polyline.classList.add('path');
+        }
+      });
     }
   };
+
+  function toggleCode(evt, cityName) {
+    let i, tabcontent, tablinks;
+
+    tabcontent = document.getElementsByClassName('tabcontent');
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = 'none';
+    }
+
+    tablinks = document.getElementsByClassName('tablinks');
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(' active', '');
+    }
+    if (cityName) {
+      document.getElementById(cityName).style.display = 'block';
+      document.getElementById('closeTab').style.display = 'block';
+      evt.currentTarget.className += ' active';
+    } else  {
+      document.getElementById('closeTab').style.display = 'none';
+    }
+  }
 
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   return (
@@ -454,10 +541,6 @@ const App = () => {
                   setFuseBurned={setFuseBurned}
                 />
               </Rail>
-              <footer className="source">
-                <a href="https://twitter.com/md_tanrikulu">@tanrikulu.eth</a> -{' '}
-                <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
-              </footer>
             </Panel>
           </>
         ) : (
@@ -472,7 +555,7 @@ const App = () => {
                   </pre>
                   {Object.values(fusesDict)
                     .reverse()
-                    .forEach((fuse, index) =>
+                    .map((fuse, index) =>
                       generateCheckbox(
                         index,
                         fuse === CANNOT_UNWRAP ? 'yellow' : 'red',
@@ -518,10 +601,100 @@ const App = () => {
               </div>
               {generateTable(parentFuses, childFuses)}
             </div>
-            <footer className="source">
-              <a href="https://twitter.com/md_tanrikulu">@tanrikulu.eth</a> -{' '}
-              <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
-            </footer>
+            <div className="exportCode">
+              <div className="tab">
+                <button
+                  className="tablinks"
+                  onClick={(event) => toggleCode(event, 'Javascript')}
+                >
+                  Javascript
+                </button>
+                <button
+                  className="tablinks"
+                  onClick={(event) => toggleCode(event, 'Solidity')}
+                >
+                  Solidity
+                </button>
+                <button
+                  id="closeTab"
+                  style={{ display: 'none' }}
+                  className="tablinks"
+                  onClick={(event) => toggleCode(event)}
+                >
+                  ✕
+                </button>
+                <div className="source">
+                  <a href="https://twitter.com/ensdomains">@ensdomains</a> -{' '}
+                  <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
+                </div>
+              </div>
+
+              <div id="Javascript" className="tabcontent">
+                <Highlight
+                  {...defaultProps}
+                  theme={theme}
+                  code={jsCode}
+                  language="js"
+                >
+                  {({
+                    className,
+                    style,
+                    tokens,
+                    getLineProps,
+                    getTokenProps,
+                  }) => (
+                    <Pre className={className} style={style}>
+                      {tokens.map((line, i) => (
+                        <Line key={i} {...getLineProps({ line, key: i })}>
+                          <LineNo>{i + 1}</LineNo>
+                          <LineContent>
+                            {line.map((token, key) => (
+                              <span
+                                key={key}
+                                {...getTokenProps({ token, key })}
+                              />
+                            ))}
+                          </LineContent>
+                        </Line>
+                      ))}
+                    </Pre>
+                  )}
+                </Highlight>
+              </div>
+
+              <div id="Solidity" className="tabcontent">
+                <Highlight
+                  {...defaultProps}
+                  theme={theme}
+                  code={solidityCode}
+                  language="ts"
+                >
+                  {({
+                    className,
+                    style,
+                    tokens,
+                    getLineProps,
+                    getTokenProps,
+                  }) => (
+                    <Pre className={className} style={style}>
+                      {tokens.map((line, i) => (
+                        <Line key={i} {...getLineProps({ line, key: i })}>
+                          <LineNo>{i + 1}</LineNo>
+                          <LineContent>
+                            {line.map((token, key) => (
+                              <span
+                                key={key}
+                                {...getTokenProps({ token, key })}
+                              />
+                            ))}
+                          </LineContent>
+                        </Line>
+                      ))}
+                    </Pre>
+                  )}
+                </Highlight>
+              </div>
+            </div>
           </Grid>
         )}
       </Container>

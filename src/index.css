@@ -15,12 +15,13 @@ code {
 
 .source {
   position: relative;
-  width: 100%;
-  bottom: 25px;
   font-size: 10pt;
   font-weight: bold;
+  margin-left: auto;
+  margin-right: 15px;
 }
 
 .source a {
   text-decoration: underline;
+  color: #999999;
 }
