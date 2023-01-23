@@ -322,7 +322,7 @@ div[class^='grid'] {
   }
 }
 
-.button-cs {
+.button {
   position: relative;
   -moz-box-align: center;
   align-items: center;
@@ -343,6 +343,9 @@ div[class^='grid'] {
   padding: 0.875rem 1rem;
   color: rgb(255, 255, 255);
   background: rgb(56, 136, 255);
+}
+
+.button-cs {
   animation: press 1s ease-out infinite;
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:32px;'><text y='50%'>🔥</text></svg>")
       16 0,
@@ -400,4 +403,22 @@ div[class^='grid'] {
   display: none;
   border: 1px solid #ccc;
   border-top: none;
+}
+
+.mask rect {
+  fill-opacity: 0.5;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 8pt;
+  font-weight: bold;
+  color: #9e9e9e;
+  margin-top: 60px;
+}
+.brand img {
+  margin: 7px 0;
 }

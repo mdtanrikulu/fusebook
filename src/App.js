@@ -1,4 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import Tour from 'reactour';
 import styled, { css, ThemeProvider } from 'styled-components';
 import {
   ThorinGlobalStyles,
@@ -358,6 +360,7 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
         className="path"
         fill="none"
         stroke="black"
+        stroke-opacity={0.4}
         strokeWidth={3}
         points={`${arrowStartWidth},0 
         ${arrowStartWidth},${arrowStartHeight} 
@@ -436,6 +439,40 @@ function createArrows(windowWidth) {
   );
 }
 
+const tourConfig = [
+  {
+    content: `Ok, let's start with with the fuses and what they do.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-PARENT_CANNOT_CONTROL"]',
+    content: `If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. Calls to setSubnodeOwner and setSubnodeRecord will fail if they reference a name that already exists. Attempting to burn fuses in setChildFuses will also fail. This fuse can only be burnt by the parent of a node. PARENT_CANNOT_CONTROL cannot be burned unless CANNOT_UNWRAP is burned on the parent name. Burning PARENT_CANNOT_CONTROL moves the name to the Emancipated state.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_UNWRAP"]',
+    content: `If this fuse is burned, the name cannot be unwrapped, and calls to unwrap and unwrapETH2LD, as well as other effects that would unwrap a name such as setSubnodeOwner will fail. CANNOT_UNWRAP cannot be burned unless PARENT_CANNOT_CONTROL is also burned. Burning CANNOT_UNWRAP moves the name to the Locked state. Other user-controlled fuses cannot be burned unless CANNOT_UNWRAP is burned.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_SET_TTL"]',
+    content: `If this fuse is burned, the TTL cannot be changed. Calls to setTTL, setRecord, and setSubnodeRecord will fail.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_SET_RESOLVER"]',
+    content: `If this fuse is burned, the resolver cannot be changed. Calls to setResolver, setRecord and setSubnodeRecord will fail.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_TRANSFER"]',
+    content: `If this fuse is burned, the name cannot be transferred. Calls to safeTransferFrom and safeBatchTransferFrom will fail.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_CREATE_SUBDOMAIN"]',
+    content: `If this fuse is burned, new subdomains cannot be created. Calls to setSubnodeOwner and setSubnodeRecord will fail if they reference a name that does not already exist.`,
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_BURN_FUSES"]',
+    content: `If this fuse is burned, no further fuses can be burned. This has the effect of ‘locking open’ some set of permissions on the name. Calls to setFuses, and other methods that modify the set of fuses, will fail. Other methods can still be called successfully so long as they do not specify new fuses to burn.`,
+  },
+];
+
 const App = () => {
   const [parentFuses, setParentFuses] = useState(
     new Set(['PARENT_CANNOT_CONTROL', 'CANNOT_UNWRAP'])
@@ -443,6 +480,7 @@ const App = () => {
   const [childFuses, setChildFuses] = useState(new Set());
   const [interactiveView, toggleInteractiveView] = useState(true);
   const [fuseBurned, setFuseBurned] = useState(false);
+  const [isTourOpen, setTourOpen] = useState(false);
 
   const scrollPosition = useScrollPosition();
   const [width] = useWindowSize();
@@ -487,7 +525,7 @@ const App = () => {
       document.getElementById(cityName).style.display = 'block';
       document.getElementById('closeTab').style.display = 'block';
       evt.currentTarget.className += ' active';
-    } else  {
+    } else {
       document.getElementById('closeTab').style.display = 'none';
     }
   }
@@ -499,6 +537,17 @@ const App = () => {
       <Container>
         {interactiveView ? (
           <>
+            <Tour
+              onRequestClose={() => setTourOpen(false)}
+              steps={tourConfig}
+              isOpen={isTourOpen}
+              maskClassName="mask"
+              className="helper"
+              rounded={5}
+              accentColor="rgb(56, 136, 255)"
+              onAfterOpen={(target) => disableBodyScroll(target)}
+              onBeforeClose={(target) => enableBodyScroll(target)}
+            />
             <div className="fuseLogo">
               <h1>Fuse Book</h1>
               <div>Interactive Fuse Guide for NameWrapper</div>
@@ -524,6 +573,9 @@ const App = () => {
                   fuseBurned={fuseBurned}
                   setFuseBurned={setFuseBurned}
                   handleSubdomainCreation={handleSubdomainCreation}
+                  startTour={() => {
+                    setTourOpen(true);
+                  }}
                 />
               </Rail>
               {createArrows(width)}

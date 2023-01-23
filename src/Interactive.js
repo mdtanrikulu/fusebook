@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import Tippy from '@tippyjs/react';
 import matchboxIcon from './assets/matchbox.svg';
 import arrowImg from './assets/arrow.svg';
+import logo from './assets/logo.svg';
 
 const PHASE_INTRO_Y_POS = 300;
 const PHASE_BASE_Y_POS = 735;
@@ -58,6 +59,7 @@ function generateCheckbox(
       key={`checkbox-${index}`}
       id={`fuseBox${!isSubname ? '2LD' : '3LD'}_${label}${nonce}`}
       className={`fuse-switch ${disabled ? `disabled` : color}`}
+      data-tut={`${isSubname ? '' : 'tour__nw-' + label}`}
     >
       <label>
         <input
@@ -89,30 +91,17 @@ function setPCBackgroundState(fuses, fusesDict) {
 }
 
 function setEmancipatedBackgroundState(fuses, fusesDict) {
-  const {
-    CANNOT_BURN_FUSES,
-    PARENT_CANNOT_CONTROL,
-  } = fusesDict;
+  const { CANNOT_BURN_FUSES, PARENT_CANNOT_CONTROL } = fusesDict;
   if (!fuses.has(PARENT_CANNOT_CONTROL)) return BACKGROUND_RED;
-  if (
-    fuses.has(CANNOT_BURN_FUSES)
-  )
-    return BACKGROUND_RED;
+  if (fuses.has(CANNOT_BURN_FUSES)) return BACKGROUND_RED;
   return BACKGROUND_GREEN;
 }
 
 function setOCBackgroundState(fuses, fusesDict) {
-  const {
-    CANNOT_BURN_FUSES,
-    CANNOT_UNWRAP,
-    PARENT_CANNOT_CONTROL,
-  } = fusesDict;
+  const { CANNOT_BURN_FUSES, CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   if (!fuses.has(CANNOT_UNWRAP) || !fuses.has(PARENT_CANNOT_CONTROL))
     return BACKGROUND_RED;
-  if (
-    fuses.has(CANNOT_BURN_FUSES)
-  )
-    return BACKGROUND_RED;
+  if (fuses.has(CANNOT_BURN_FUSES)) return BACKGROUND_RED;
   return BACKGROUND_GREEN;
 }
 
@@ -129,6 +118,7 @@ export default function InteractiveView({
   fuseBurned,
   setFuseBurned,
   handleSubdomainCreation = () => {},
+  startTour = () => {},
 }) {
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
   const isSubname = name.split('.').length > 2;
@@ -178,6 +168,12 @@ export default function InteractiveView({
       scrollPosition <= PHASE_4_Y_POS
     ) {
       textInfo.innerText = 'And use fuses on both names!';
+      const wtfButton = document.createElement('button');
+      wtfButton.classList.add('button');
+      wtfButton.textContent = 'What is fuses?';
+      wtfButton.style.width = '300px';
+      wtfButton.onclick = () => startTour();
+      textInfo.append(wtfButton);
     } else if (
       scrollPosition > PHASE_4_Y_POS &&
       scrollPosition <= PHASE_5_Y_POS
@@ -370,14 +366,14 @@ export default function InteractiveView({
                           )}
                       </div>
                       <button
-                        className="button-cs"
-                        onClick={() => {
+                        className="button button-cs"
+                        onClick={(target) => {
                           handleSubdomainCreation();
                           setFuseBurned(true);
                           setTooltipVisible(false);
                         }}
                       >
-                        Create Subdomain
+                        Burn Subdomain Fuses
                       </button>
                     </div>
                   }
@@ -393,6 +389,12 @@ export default function InteractiveView({
         </div>
       </InteractiveGrid>
       <div id="textInfo" className="textInfo" />
+      {isSubname && (
+        <div className="brand">
+          <img src={logo} width="64" />
+          Ethereum Name Service
+        </div>
+      )}
     </div>
   );
 }
