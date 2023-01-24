@@ -409,6 +409,19 @@ div[class^='grid'] {
   fill-opacity: 0.5;
 }
 
+.helper {
+  line-height: 1.4rem;
+  padding-top: 40px !important;
+  max-width: 520px !important;
+}
+
+.helper code {
+  background-color: #ececec;
+  font-weight: 600;
+  color: #4b4b4b;
+  padding: 0 5px;
+}
+
 .brand {
   display: flex;
   flex-direction: column;

@@ -445,31 +445,69 @@ const tourConfig = [
   },
   {
     selector: '[data-tut="tour__nw-PARENT_CANNOT_CONTROL"]',
-    content: `If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. Calls to setSubnodeOwner and setSubnodeRecord will fail if they reference a name that already exists. Attempting to burn fuses in setChildFuses will also fail. This fuse can only be burnt by the parent of a node. PARENT_CANNOT_CONTROL cannot be burned unless CANNOT_UNWRAP is burned on the parent name. Burning PARENT_CANNOT_CONTROL moves the name to the Emancipated state.`,
+    content: () => (
+      <div>
+        If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. 
+        Calls to <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will fail if they reference a name that already exists.
+        Attempting to burn fuses in <code>setChildFuses</code> will also fail.
+        <br/><br/>
+        This fuse can only be burnt by the parent of a node. <code>PARENT_CANNOT_CONTROL</code> cannot be burned unless <code>CANNOT_UNWRAP</code> is burned on the parent name. Burning <code>PARENT_CANNOT_CONTROL</code> moves the name to the Emancipated state.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_UNWRAP"]',
-    content: `If this fuse is burned, the name cannot be unwrapped, and calls to unwrap and unwrapETH2LD, as well as other effects that would unwrap a name such as setSubnodeOwner will fail. CANNOT_UNWRAP cannot be burned unless PARENT_CANNOT_CONTROL is also burned. Burning CANNOT_UNWRAP moves the name to the Locked state. Other user-controlled fuses cannot be burned unless CANNOT_UNWRAP is burned.`,
+    content: () => (
+      <div>
+        If this fuse is burned, the name cannot be unwrapped, and calls to <code>unwrap</code> and <code>unwrapETH2LD</code>, as well as other effects that would unwrap a name such as <code>setSubnodeOwner</code> will fail.
+        <br/><br/>
+        <code>CANNOT_UNWRAP</code> cannot be burned unless <code>PARENT_CANNOT_CONTROL</code> is also burned. Burning <code>CANNOT_UNWRAP</code> moves the name to the Locked state.
+        <br/><br/>
+        Other user-controlled fuses cannot be burned unless <code>CANNOT_UNWRAP</code> is burned.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_SET_TTL"]',
-    content: `If this fuse is burned, the TTL cannot be changed. Calls to setTTL, setRecord, and setSubnodeRecord will fail.`,
+    content: () => (
+      <div>
+        If this fuse is burned, the TTL cannot be changed. Calls to <code>setTTL</code>, <code>setRecord</code>, and <code>setSubnodeRecord</code> will fail.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_SET_RESOLVER"]',
-    content: `If this fuse is burned, the resolver cannot be changed. Calls to setResolver, setRecord and setSubnodeRecord will fail.`,
+    content: () => (
+      <div>
+        If this fuse is burned, the resolver cannot be changed. Calls to <code>setResolver</code>, <code>setRecord</code> and <code>setSubnodeRecord</code> will fail.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_TRANSFER"]',
-    content: `If this fuse is burned, the name cannot be transferred. Calls to safeTransferFrom and safeBatchTransferFrom will fail.`,
+    content: () => (
+      <div>
+        If this fuse is burned, the name cannot be transferred. Calls to <code>safeTransferFrom</code> and <code>safeBatchTransferFrom</code> will fail.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_CREATE_SUBDOMAIN"]',
-    content: `If this fuse is burned, new subdomains cannot be created. Calls to setSubnodeOwner and setSubnodeRecord will fail if they reference a name that does not already exist.`,
+    content: () => (
+      <div>
+        If this fuse is burned, new subdomains cannot be created. Calls to <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will fail if they reference a name that does not already exist.
+      </div>
+    ),
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_BURN_FUSES"]',
-    content: `If this fuse is burned, no further fuses can be burned. This has the effect of ‘locking open’ some set of permissions on the name. Calls to setFuses, and other methods that modify the set of fuses, will fail. Other methods can still be called successfully so long as they do not specify new fuses to burn.`,
+    content: () => (
+      <div>
+        If this fuse is burned, no further fuses can be burned. This has the effect of ‘locking open’ some set of permissions on the name.
+        <br/><br/>
+        Calls to <code>setFuses</code>, and other methods that modify the set of fuses, will fail. Other methods can still be called successfully so long as they do not specify new fuses to burn.
+      </div>
+    ),
   },
 ];
 
@@ -544,7 +582,9 @@ const App = () => {
               maskClassName="mask"
               className="helper"
               rounded={5}
+              startAt={0}
               accentColor="rgb(56, 136, 255)"
+              lastStepNextButton={<button>That's it!</button>}
               onAfterOpen={(target) => disableBodyScroll(target)}
               onBeforeClose={(target) => enableBodyScroll(target)}
             />
