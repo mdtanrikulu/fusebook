@@ -447,7 +447,7 @@ const tourConfig = [
     selector: '[data-tut="tour__nw-PARENT_CANNOT_CONTROL"]',
     content: () => (
       <div>
-        If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. 
+        This is <code>PARENT_CANNOT_CONTROL</code> fuse. If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. 
         Calls to <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will fail if they reference a name that already exists.
         Attempting to burn fuses in <code>setChildFuses</code> will also fail.
         <br/><br/>
