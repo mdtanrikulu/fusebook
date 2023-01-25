@@ -4,6 +4,7 @@ import Tippy from '@tippyjs/react';
 import matchboxIcon from './assets/matchbox.svg';
 import arrowImg from './assets/arrow.svg';
 import logo from './assets/logo.svg';
+import { disableBodyScroll } from 'body-scroll-lock';
 
 const PHASE_INTRO_Y_POS = 300;
 const PHASE_BASE_Y_POS = 735;
@@ -105,6 +106,16 @@ function setOCBackgroundState(fuses, fusesDict) {
   return BACKGROUND_GREEN;
 }
 
+function getWrapperState(fuses, fusesDict, scrollPosition) {
+  if (scrollPosition < PHASE_1_Y_POS) return 'Unwrapped';
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
+  if (fuses.has(PARENT_CANNOT_CONTROL)) {
+    if (fuses.has(CANNOT_UNWRAP)) return 'Locked';
+    return 'Emancipated';
+  }
+  return 'Wrapped';
+}
+
 export default function InteractiveView({
   name,
   fusesDict,
@@ -168,11 +179,16 @@ export default function InteractiveView({
       scrollPosition <= PHASE_4_Y_POS
     ) {
       textInfo.innerText = 'And use fuses on both names!';
+      disableBodyScroll(document.body);
       const wtfButton = document.createElement('button');
       wtfButton.classList.add('button');
-      wtfButton.textContent = 'What is fuses?';
+      wtfButton.classList.add('button-cs');
+      wtfButton.textContent = 'What is fuse?';
       wtfButton.style.width = '300px';
-      wtfButton.onclick = () => startTour();
+      wtfButton.onclick = () => {
+        startTour();
+        wtfButton.classList.remove('button-cs');
+      };
       textInfo.append(wtfButton);
     } else if (
       scrollPosition > PHASE_4_Y_POS &&
@@ -210,6 +226,10 @@ export default function InteractiveView({
         >
           <div className="header-pf">
             <h1>ERC-1155 NFT</h1>
+            <code className="wrapper-state">
+              Wrapper State:{' '}
+              {getWrapperState(isSubname ? childFuses : parentFuses, fusesDict, scrollPosition)}
+            </code>
           </div>
           <div className="fuses-pf">
             <div>

@@ -9,6 +9,10 @@ body {
   margin-right: calc(-1 * (100vw - 100%));
 }
 
+* {
+  font-variant-numeric: tabular-nums;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

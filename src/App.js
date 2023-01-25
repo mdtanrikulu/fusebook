@@ -439,86 +439,184 @@ function createArrows(windowWidth) {
   );
 }
 
-const tourConfig = [
+const tourConfig = (setParentFuses, setTourNavDisabled) => [
   {
-    content: `Ok, let's start with with the fuses and what they do.`,
+    content: () => {
+      setTourNavDisabled(false);
+      return <div>Ok, let's start with with the fuses and what they do.</div>;
+    },
   },
   {
     selector: '[data-tut="tour__nw-PARENT_CANNOT_CONTROL"]',
-    content: () => (
-      <div>
-        This is <code>PARENT_CANNOT_CONTROL</code> fuse. If this fuse is burned, existing subdomains cannot be replaced by the parent name and the parent can no longer burn other fuses on this child. 
-        Calls to <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will fail if they reference a name that already exists.
-        Attempting to burn fuses in <code>setChildFuses</code> will also fail.
-        <br/><br/>
-        This fuse can only be burnt by the parent of a node. <code>PARENT_CANNOT_CONTROL</code> cannot be burned unless <code>CANNOT_UNWRAP</code> is burned on the parent name. Burning <code>PARENT_CANNOT_CONTROL</code> moves the name to the Emancipated state.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          This is <code>PARENT_CANNOT_CONTROL</code> fuse. If this fuse is
+          burned, existing subdomains cannot be replaced by the parent name and
+          the parent can no longer burn other fuses on this child. Calls to{' '}
+          <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will
+          fail if they reference a name that already exists. Attempting to burn
+          fuses in <code>setChildFuses</code> will also fail.
+          <br />
+          <br />
+          This fuse can only be burnt by the parent of a node.{' '}
+          <code>PARENT_CANNOT_CONTROL</code> cannot be burned unless{' '}
+          <code>CANNOT_UNWRAP</code> is burned on the parent name. Burning{' '}
+          <code>PARENT_CANNOT_CONTROL</code> moves the name to the Emancipated
+          state.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_UNWRAP"]',
-    content: () => (
-      <div>
-        If this fuse is burned, the name cannot be unwrapped, and calls to <code>unwrap</code> and <code>unwrapETH2LD</code>, as well as other effects that would unwrap a name such as <code>setSubnodeOwner</code> will fail.
-        <br/><br/>
-        <code>CANNOT_UNWRAP</code> cannot be burned unless <code>PARENT_CANNOT_CONTROL</code> is also burned. Burning <code>CANNOT_UNWRAP</code> moves the name to the Locked state.
-        <br/><br/>
-        Other user-controlled fuses cannot be burned unless <code>CANNOT_UNWRAP</code> is burned.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, the name cannot be unwrapped, and calls to{' '}
+          <code>unwrap</code> and <code>unwrapETH2LD</code>, as well as other
+          effects that would unwrap a name such as <code>setSubnodeOwner</code>{' '}
+          will fail.
+          <br />
+          <br />
+          <code>CANNOT_UNWRAP</code> cannot be burned unless{' '}
+          <code>PARENT_CANNOT_CONTROL</code> is also burned. Burning{' '}
+          <code>CANNOT_UNWRAP</code> moves the name to the <code>Locked</code>{' '}
+          state.
+          <br />
+          <br />
+          Other user-controlled fuses cannot be burned unless{' '}
+          <code>CANNOT_UNWRAP</code> is burned.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_SET_TTL"]',
-    content: () => (
-      <div>
-        If this fuse is burned, the TTL cannot be changed. Calls to <code>setTTL</code>, <code>setRecord</code>, and <code>setSubnodeRecord</code> will fail.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, the TTL cannot be changed. Calls to{' '}
+          <code>setTTL</code>, <code>setRecord</code>, and{' '}
+          <code>setSubnodeRecord</code> will fail.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_SET_RESOLVER"]',
-    content: () => (
-      <div>
-        If this fuse is burned, the resolver cannot be changed. Calls to <code>setResolver</code>, <code>setRecord</code> and <code>setSubnodeRecord</code> will fail.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, the resolver cannot be changed. Calls to{' '}
+          <code>setResolver</code>, <code>setRecord</code> and{' '}
+          <code>setSubnodeRecord</code> will fail.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_TRANSFER"]',
-    content: () => (
-      <div>
-        If this fuse is burned, the name cannot be transferred. Calls to <code>safeTransferFrom</code> and <code>safeBatchTransferFrom</code> will fail.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, the name cannot be transferred. Calls to{' '}
+          <code>safeTransferFrom</code> and <code>safeBatchTransferFrom</code>{' '}
+          will fail.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_CREATE_SUBDOMAIN"]',
-    content: () => (
-      <div>
-        If this fuse is burned, new subdomains cannot be created. Calls to <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will fail if they reference a name that does not already exist.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, new subdomains cannot be created. Calls to{' '}
+          <code>setSubnodeOwner</code> and <code>setSubnodeRecord</code> will
+          fail if they reference a name that does not already exist.
+        </div>
+      );
+    },
   },
   {
     selector: '[data-tut="tour__nw-CANNOT_BURN_FUSES"]',
-    content: () => (
-      <div>
-        If this fuse is burned, no further fuses can be burned. This has the effect of ‘locking open’ some set of permissions on the name.
-        <br/><br/>
-        Calls to <code>setFuses</code>, and other methods that modify the set of fuses, will fail. Other methods can still be called successfully so long as they do not specify new fuses to burn.
-      </div>
-    ),
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, no further fuses can be burned. This has the
+          effect of ‘locking open’ some set of permissions on the name.
+          <br />
+          <br />
+          Calls to <code>setFuses</code>, and other methods that modify the set
+          of fuses, will fail. Other methods can still be called successfully so
+          long as they do not specify new fuses to burn.
+        </div>
+      );
+    },
+  },
+  {
+    selector: '[data-tut="tour__nw-CANNOT_UNWRAP"]',
+    content: ({ goTo }) => {
+      setTourNavDisabled(true);
+      return (
+        <div>
+          <center>
+            <h4>That was it!!</h4>
+          </center>
+          <br />
+          Now, before keep scrolling down to create a new subdomain, we must
+          burn this fuse.
+          <button
+            className="button"
+            onClick={() => {
+              setParentFuses((previousState) =>
+                new Set(previousState).add(fusesDict.CANNOT_UNWRAP)
+              );
+              goTo(9);
+            }}
+          >
+            Let's burn 🔥
+          </button>
+        </div>
+      );
+    },
+  },
+  {
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          <center>
+            <h4>
+              Congratz!! Your ENS Name is in <code>Locked</code> state.
+            </h4>
+          </center>
+          <br />
+          Which means, now you can create unlimited amount of wrapped subdomains
+          under your name.
+        </div>
+      );
+    },
   },
 ];
 
 const App = () => {
   const [parentFuses, setParentFuses] = useState(
-    new Set(['PARENT_CANNOT_CONTROL', 'CANNOT_UNWRAP'])
+    new Set(['PARENT_CANNOT_CONTROL'])
   );
   const [childFuses, setChildFuses] = useState(new Set());
   const [interactiveView, toggleInteractiveView] = useState(true);
   const [fuseBurned, setFuseBurned] = useState(false);
   const [isTourOpen, setTourOpen] = useState(false);
+  const [isTourNavDisabled, setTourNavDisabled] = useState(false);
 
   const scrollPosition = useScrollPosition();
   const [width] = useWindowSize();
@@ -577,14 +675,19 @@ const App = () => {
           <>
             <Tour
               onRequestClose={() => setTourOpen(false)}
-              steps={tourConfig}
+              steps={tourConfig(setParentFuses, setTourNavDisabled)}
               isOpen={isTourOpen}
               maskClassName="mask"
               className="helper"
               rounded={5}
               startAt={0}
+              showNavigation={!isTourNavDisabled}
+              showButtons={!isTourNavDisabled}
+              disableKeyboardNavigation={
+                isTourNavDisabled ? ['esc', 'right'] : false
+              }
+              lastStepNextButton={<button>Done!</button>}
               accentColor="rgb(56, 136, 255)"
-              lastStepNextButton={<button>That's it!</button>}
               onAfterOpen={(target) => disableBodyScroll(target)}
               onBeforeClose={(target) => enableBodyScroll(target)}
             />
