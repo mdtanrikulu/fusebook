@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/fusebook/static/css/main.293dc2a0.css",
-    "main.js": "/fusebook/static/js/main.d518220e.js",
+    "main.css": "/fusebook/static/css/main.616471c8.css",
+    "main.js": "/fusebook/static/js/main.754e9f4f.js",
     "static/js/787.8a67f869.chunk.js": "/fusebook/static/js/787.8a67f869.chunk.js",
     "static/media/matchbox.svg": "/fusebook/static/media/matchbox.3df852d6c4b7f183530c7f9a33e1f5a3.svg",
     "static/media/arrow.svg": "/fusebook/static/media/arrow.f49679d1f6a7e3196af53c55855e40d5.svg",
     "static/media/logo.svg": "/fusebook/static/media/logo.495d9dbe59aa9f376185ecd65edb62a6.svg",
     "index.html": "/fusebook/index.html",
-    "main.293dc2a0.css.map": "/fusebook/static/css/main.293dc2a0.css.map",
-    "main.d518220e.js.map": "/fusebook/static/js/main.d518220e.js.map",
+    "main.616471c8.css.map": "/fusebook/static/css/main.616471c8.css.map",
+    "main.754e9f4f.js.map": "/fusebook/static/js/main.754e9f4f.js.map",
     "787.8a67f869.chunk.js.map": "/fusebook/static/js/787.8a67f869.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.293dc2a0.css",
-    "static/js/main.d518220e.js"
+    "static/css/main.616471c8.css",
+    "static/js/main.754e9f4f.js"
   ]
 }

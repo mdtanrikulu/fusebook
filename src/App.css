@@ -1,7 +1,7 @@
 table,
 th,
 td {
-  border: 2px solid rgb(232, 231, 231);
+  border: 1px solid rgb(232, 231, 231);
   border-collapse: collapse;
   table-layout: fixed;
   border-radius: 5px;
@@ -15,7 +15,7 @@ th {
 
 table {
   position: sticky;
-  top: calc(20vh - 50px);
+  top: calc(20vh - 80px);
   border-radius: 5px;
   border-style: hidden; /* hide standard table (collapsed) border */
   box-shadow: 0 0 0 2px rgb(232, 231, 231); /* this draws the table border  */
@@ -24,7 +24,7 @@ table {
 th {
   background-color: black;
   color: white;
-  line-height: 40px;
+  line-height: 30px;
 }
 
 input:not(:disabled) {
@@ -273,11 +273,14 @@ div[class^='grid'] {
 }
 
 .textInfo {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
   min-width: 700px;
-  margin: 30px 20%;
-  font-size: 21pt;
+  margin: 20px 20%;
+  font-size: 16pt;
   font-weight: bold;
-  text-align: center;
   line-height: 2.5rem;
 }
 

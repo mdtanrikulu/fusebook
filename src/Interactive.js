@@ -6,8 +6,8 @@ import arrowImg from './assets/arrow.svg';
 import logo from './assets/logo.svg';
 import { disableBodyScroll } from 'body-scroll-lock';
 
-const PHASE_INTRO_Y_POS = 300;
-const PHASE_BASE_Y_POS = 735;
+const PHASE_INTRO_Y_POS = 425;
+const PHASE_BASE_Y_POS = 770;
 const PHASE_1_Y_POS = 800;
 const PHASE_2_Y_POS = 1600;
 const PHASE_3_Y_POS = 2200;
@@ -19,11 +19,13 @@ const BACKGROUND_GREEN = { backgroundColor: 'rgb(73, 179, 147)' };
 
 const labelDict = {
   CANNOT_BURN_FUSES: 'Cannot Burn Fuses',
+  CANNOT_APPROVE: 'Cannot Approve',
   CANNOT_CREATE_SUBDOMAIN: 'Create Subdomain',
   CANNOT_TRANSFER: 'Transfer',
   CANNOT_SET_RESOLVER: 'Set Resolver',
   CANNOT_SET_TTL: 'Set TTL',
   CANNOT_UNWRAP: 'Cannot Unwrap',
+  CAN_EXTEND_EXPIRY: 'Can Extend Expiry',
   PARENT_CANNOT_CONTROL: 'Parent Cannot Control',
 };
 
@@ -131,7 +133,7 @@ export default function InteractiveView({
   handleSubdomainCreation = () => {},
   startTour = () => {},
 }) {
-  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL, CAN_EXTEND_EXPIRY } = fusesDict;
   const isSubname = name.split('.').length > 2;
   const [isTooltipVisible, setTooltipVisible] = useState(false);
 
@@ -168,7 +170,7 @@ export default function InteractiveView({
     ) {
       base.style = null;
       wrapper.style.position = 'sticky';
-      wrapper.style.top = '85px';
+      wrapper.style.top = '25px';
     }
 
     if (scrollPosition > PHASE_2_Y_POS && scrollPosition <= PHASE_3_Y_POS) {
@@ -202,7 +204,7 @@ export default function InteractiveView({
         setTooltipVisible(true);
         const tippy = document.querySelectorAll('[id^=tippy-]')[0];
         if (tippy) {
-          tippy.style.width = '500px';
+          tippy.style.width = '620px';
         }
       }
     } else if (scrollPosition > PHASE_1_Y_POS) {
@@ -216,6 +218,7 @@ export default function InteractiveView({
       id={`wrapper${!isSubname ? '2LD' : '3LD'}`}
       style={isSubname ? { zIndex: '1' } : {}}
     >
+      {isSubname ? null :<div id="textInfo" className="textInfo" />}
       <InteractiveGrid>
         <div
           className="grid-pf"
@@ -235,7 +238,7 @@ export default function InteractiveView({
             <div>
               {Object.values(fusesDict)
                 .reverse()
-                .slice(0, 1)
+                .slice(0, 2)
                 .map((fuse, index) =>
                   generateCheckbox(
                     index,
@@ -243,7 +246,8 @@ export default function InteractiveView({
                     fuse,
                     isSubname ? childFuses : parentFuses,
                     isSubname ? setChildFuses : setParentFuses,
-                    fuse === PARENT_CANNOT_CONTROL
+                    fuse === PARENT_CANNOT_CONTROL ||
+                    fuse === CAN_EXTEND_EXPIRY
                       ? isSubname
                         ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                         : null
@@ -275,7 +279,7 @@ export default function InteractiveView({
                 : {
                     display: 'flex',
                     position: 'fixed',
-                    top: '300px',
+                    top: `${PHASE_INTRO_Y_POS}px`,
                   }
             }
           >
@@ -313,7 +317,7 @@ export default function InteractiveView({
             <div>
               {Object.values(fusesDict)
                 .reverse()
-                .slice(1)
+                .slice(2)
                 .map((fuse, index) =>
                   generateCheckbox(
                     index + 10, // different indexes than parent
@@ -408,7 +412,6 @@ export default function InteractiveView({
           </div>
         </div>
       </InteractiveGrid>
-      <div id="textInfo" className="textInfo" />
       {isSubname && (
         <div className="brand">
           <img src={logo} width="64" />

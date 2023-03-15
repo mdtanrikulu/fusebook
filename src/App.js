@@ -115,25 +115,32 @@ const InnerContainer = styled.div(
 
 const fusesDict = Object.freeze({
   CANNOT_BURN_FUSES: 'CANNOT_BURN_FUSES',
+  CANNOT_APPROVE: 'CANNOT_APPROVE',
   CANNOT_CREATE_SUBDOMAIN: 'CANNOT_CREATE_SUBDOMAIN',
   CANNOT_TRANSFER: 'CANNOT_TRANSFER',
   CANNOT_SET_RESOLVER: 'CANNOT_SET_RESOLVER',
   CANNOT_SET_TTL: 'CANNOT_SET_TTL',
   CANNOT_UNWRAP: 'CANNOT_UNWRAP',
+  CAN_EXTEND_EXPIRY: 'CAN_EXTEND_EXPIRY',
   PARENT_CANNOT_CONTROL: 'PARENT_CANNOT_CONTROL',
 });
 
 function checkParent(parentFuses, childFuse) {
-  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL, CAN_EXTEND_EXPIRY } = fusesDict;
 
   if (childFuse === PARENT_CANNOT_CONTROL) {
     return parentFuses.has(CANNOT_UNWRAP);
+  }
+
+  if (childFuse === CAN_EXTEND_EXPIRY) {
+    return false;
   }
 }
 
 function checkSelf(fuses, fuse) {
   const {
     CANNOT_BURN_FUSES,
+    CANNOT_APPROVE,
     CANNOT_CREATE_SUBDOMAIN,
     CANNOT_TRANSFER,
     CANNOT_SET_RESOLVER,
@@ -141,6 +148,10 @@ function checkSelf(fuses, fuse) {
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
   } = fusesDict;
+
+  if (fuse === CANNOT_APPROVE) {
+    return true
+  }
 
   if (fuse === CANNOT_UNWRAP) {
     return fuses.has(PARENT_CANNOT_CONTROL);
@@ -168,18 +179,21 @@ function checkSelf(fuses, fuse) {
 function generateTable(parentFuses, childFuses) {
   const {
     CANNOT_BURN_FUSES,
+    CANNOT_APPROVE,
     CANNOT_CREATE_SUBDOMAIN,
     CANNOT_TRANSFER,
     CANNOT_SET_RESOLVER,
     CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
+    CAN_EXTEND_EXPIRY,
   } = fusesDict;
 
   const methods = {
     wrapETH2LD: [1, 0],
     registerAndWrapETH2LD: [1, 0],
     wrap: [1, 1],
+    approve: [1, 1],
     setChildFuses: [1, 1],
     setSubnodeOwner: [1, 1],
     setSubnodeRecord: [1, 1],
@@ -189,6 +203,7 @@ function generateTable(parentFuses, childFuses) {
     setFuses: [1, 1],
     safeTransferFrom: [1, 1],
     safeBatchTransferFrom: [1, 1],
+    extendExpiry: [0, 1],
     renew: [1, 1],
     unwrapETH2LD: [1, 0],
     unwrap: [1, 1],
@@ -239,6 +254,20 @@ function generateTable(parentFuses, childFuses) {
         return states[2];
       }
       return states[1];
+    }
+
+    if (key === 'approve') {
+      if (fuses.has(CANNOT_APPROVE)) {
+        return states[2];
+      }
+      return states[1];
+    }
+
+    if (key === 'extendExpiry') {
+      if (fuses.has(CAN_EXTEND_EXPIRY)) {
+        return states[1];
+      }
+      return states[2];
     }
 
     if (key === 'setFuses' || key === 'setRecord' || key === 'setTTL') {
@@ -328,12 +357,12 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
       ? windowWidth + ((1250 - windowWidth) * 550) / windowWidth
       : windowWidth;
   const arrowEndWidth = isPCC
-    ? (windowWidth + 600) / 5.2
+    ? (windowWidth + 600) / 5.2 * ((index / 42) + 1)
     : (windowWidth - 200) / 1.25;
-  const arrowEndHeight = isPCC ? 450 : 216 + 64 * index;
+  const arrowEndHeight = isPCC ? 450 * ((index / 7) + 1) : 216 + 64 * index;
   const arrowStartHeight = 70 + 10 * index;
   const arrowStartWidth = isPCC
-    ? windowWidth / 2.3
+    ? windowWidth / 2.3 * ((index / 46) + 1)
     : (windowWidth - 100) / 1.72 - 10 * index;
   return (
     <svg
@@ -365,10 +394,10 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
         points={`${arrowStartWidth},0 
         ${arrowStartWidth},${arrowStartHeight} 
         ${
-          isPCC ? arrowEndWidth + 40 : arrowEndWidth - (40 + 10 * index)
+          isPCC ? arrowEndWidth + 40 * (index + 1) : arrowEndWidth - (40 + 10 * index)
         },${arrowStartHeight} ${
-          isPCC ? arrowEndWidth + 40 : arrowEndWidth - (40 + 10 * index)
-        },${arrowEndHeight} ${arrowEndWidth}, ${arrowEndHeight}`}
+          isPCC ? arrowEndWidth + 40 * (index + 1) : arrowEndWidth - (40 + 10 * index)
+        },${arrowEndHeight} ${isPCC ? arrowEndWidth / (index / 42 + 1): arrowEndWidth}, ${arrowEndHeight}`}
         markerEnd="url(#triangle)"
       />
     </svg>
@@ -428,12 +457,12 @@ function createArrows(windowWidth) {
     <div id="fuseArrows" style={{ pointerEvents: 'none' }}>
       {Object.values(fusesDict)
         .reverse()
-        .slice(0, 1)
+        .slice(0, 2)
         .map((fuse, index) => createArrow(fuse, index, windowWidth, true))}
       {createAnchor(windowWidth)}
       {Object.values(fusesDict)
         .reverse()
-        .slice(1)
+        .slice(2)
         .map((fuse, index) => createArrow(fuse, index, windowWidth))}
     </div>
   );
@@ -465,6 +494,19 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
           <code>CANNOT_UNWRAP</code> is burned on the parent name. Burning{' '}
           <code>PARENT_CANNOT_CONTROL</code> moves the name to the Emancipated
           state.
+        </div>
+      );
+    },
+  },
+  {
+    selector: '[data-tut="tour__nw-CAN_EXTEND_EXPIRY"]',
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, a name will be able to extend its own expiry in the NameWrapper. 
+          Does not apply to .eth 2LDs, as the expiry will inherit from the registrar in that case, 
+          and this fuse will not be burned when wrapping/registering .eth 2LDs.
         </div>
       );
     },
@@ -546,6 +588,19 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
     },
   },
   {
+    selector: '[data-tut="tour__nw-CANNOT_APPROVE"]',
+    content: () => {
+      setTourNavDisabled(false);
+      return (
+        <div>
+          If this fuse is burned, a name owner cannot give approval to another address. 
+          If approval is already issued before burning this fuse, the approval will remain in target address.
+          Unlike standart ERC-721 approval method, approval won't give transfer permit to the delegatee.
+        </div>
+      );
+    },
+  },
+  {
     selector: '[data-tut="tour__nw-CANNOT_BURN_FUSES"]',
     content: () => {
       setTourNavDisabled(false);
@@ -572,15 +627,14 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
             <h4>That was it!!</h4>
           </center>
           <br />
-          Now, before keep scrolling down to create a new subdomain, we must
-          burn this fuse.
+          Now, before keep scrolling down to create a new subdomain, lets start with changing state of our NFT to <code>Locked</code>.
           <button
             className="button"
             onClick={() => {
               setParentFuses((previousState) =>
                 new Set(previousState).add(fusesDict.CANNOT_UNWRAP)
               );
-              goTo(9);
+              goTo(11);
             }}
           >
             Let's burn 🔥
@@ -666,7 +720,7 @@ const App = () => {
     }
   }
 
-  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL, CAN_EXTEND_EXPIRY } = fusesDict;
   return (
     <ThemeProvider theme={lightTheme}>
       <ThorinGlobalStyles />
@@ -779,7 +833,8 @@ const App = () => {
                         fuse,
                         childFuses,
                         setChildFuses,
-                        fuse === PARENT_CANNOT_CONTROL
+                        fuse === PARENT_CANNOT_CONTROL ||
+                        fuse === CAN_EXTEND_EXPIRY
                           ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                           : !checkSelf(childFuses, fuse)
                       )
