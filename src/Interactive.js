@@ -4,9 +4,8 @@ import Tippy from '@tippyjs/react';
 import matchboxIcon from './assets/matchbox.svg';
 import arrowImg from './assets/arrow.svg';
 import logo from './assets/logo.svg';
-import { disableBodyScroll } from 'body-scroll-lock';
 
-const PHASE_INTRO_Y_POS = 425;
+const PHASE_INTRO_Y_POS = 305;
 const PHASE_BASE_Y_POS = 770;
 const PHASE_1_Y_POS = 800;
 const PHASE_2_Y_POS = 1600;
@@ -14,8 +13,8 @@ const PHASE_3_Y_POS = 2200;
 const PHASE_4_Y_POS = 3000;
 const PHASE_5_Y_POS = 4000;
 
-const BACKGROUND_RED = { backgroundColor: 'rgb(214, 112, 112)' };
-const BACKGROUND_GREEN = { backgroundColor: 'rgb(73, 179, 147)' };
+const BACKGROUND_RED = { backgroundColor: '#F2CBC7' };
+const BACKGROUND_GREEN = { backgroundColor: '#C7F2C2' };
 
 const labelDict = {
   CANNOT_BURN_FUSES: 'Cannot Burn Fuses',
@@ -40,8 +39,8 @@ const InteractiveGrid = styled.div(
       'pf base ocf'
       'sec sec sec';
     box-sizing: border-box;
-    background-color: black;
-    border: 3px solid black;
+    background-color: rgb(95, 95, 95);
+    border: 3px solid rgb(95, 95, 95);
     border-radius: 13px;
     gap: 2px;
   `
@@ -160,7 +159,7 @@ export default function InteractiveView({
 
     if (scrollPosition < PHASE_BASE_Y_POS && base.style.position === '') {
       base.style.position = 'fixed';
-      base.style.top = `${PHASE_INTRO_Y_POS}px`;
+      base.style.top = `${PHASE_INTRO_Y_POS + 120}px`;
       base.style.display = 'flex';
       wrapper.style = null;
       textInfo.innerText = '';
@@ -181,7 +180,7 @@ export default function InteractiveView({
       scrollPosition <= PHASE_4_Y_POS
     ) {
       textInfo.innerText = 'And use fuses on both names!';
-      disableBodyScroll(document.body);
+      // disableBodyScroll(document.body);
       const wtfButton = document.createElement('button');
       wtfButton.classList.add('button');
       wtfButton.classList.add('button-cs');
@@ -279,7 +278,7 @@ export default function InteractiveView({
                 : {
                     display: 'flex',
                     position: 'fixed',
-                    top: `${PHASE_INTRO_Y_POS}px`,
+                    top: `${PHASE_INTRO_Y_POS + 120}px`,
                   }
             }
           >
@@ -352,7 +351,7 @@ export default function InteractiveView({
           <div>
             <div className="grid-sub">
               <div className="grid-sub-item">
-                <span>Sub 2 fuses</span>
+                <span>Sub 2 Fuses</span>
               </div>
               <div
                 id={`createSub${isSubname ? '2' : '1'}`}
@@ -397,16 +396,16 @@ export default function InteractiveView({
                           setTooltipVisible(false);
                         }}
                       >
-                        Burn Subdomain Fuses
+                        Burn Subdomain Fuses 🔥
                       </button>
                     </div>
                   }
                 >
-                  <span>Sub 1 fuses</span>
+                  <span>Sub 1 Fuses</span>
                 </Tippy>
               </div>
               <div className="grid-sub-item">
-                <span>Sub 3 fuses</span>
+                <span>Sub 3 Fuses</span>
               </div>
             </div>
           </div>
@@ -414,7 +413,7 @@ export default function InteractiveView({
       </InteractiveGrid>
       {isSubname && (
         <div className="brand">
-          <img src={logo} width="64" />
+          <img src={logo} alt="Ethereum Name Service" width="64" />
           Ethereum Name Service
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import Lottie from 'react-lottie-light-js';
 import Tour from 'reactour';
 import styled, { css, ThemeProvider } from 'styled-components';
 import {
@@ -16,18 +17,42 @@ import theme from 'prism-react-renderer/themes/nightOwl';
 import InteractiveView from './Interactive';
 import './App.css';
 
+// ref/credit: https://lottiefiles.com/27323-scroll-down
+import scrollIconJSON from './assets/scroll-down.json';
+
+const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  animationData: scrollIconJSON,
+  rendererSettings: {
+    preserveAspectRatio: 'xMidYMid slice',
+  },
+};
+
 const PHASE_5_Y_POS = 4000;
 
 const jsCode = `
-NameWrapper.setSubnodeRecord(
-  wrappedTokenId,
-  'sub',
-  account,
-  resolver,
-  0,
-  0,
-  0,
-)
+import { ENS } from '@ensdomains/ensjs';
+import { ethers } from 'ethers';
+
+const PROVIDER_URL = '';
+const provider = new ethers.providers.JsonRpcProvider(PROVIDER_URL);
+
+const ENSInstance = new ENS();
+await ENSInstance.setProvider(provider);
+
+await ensInstance.wrapName('ens.eth', {
+  wrappedOwner: ADDRESS,
+  fuseOptions: {
+    parent: {
+      named: {parent_fuses_here}
+    }
+    child: {
+      named: {child_fuses_here},
+    },
+  },
+  addressOrIndex: 1,
+});
 `.trim();
 
 const solidityCode = `
@@ -36,9 +61,9 @@ pragma solidity ^0.8.10;
 
 import "hardhat/console.sol";
 contract Example {
-  constructor() public {
-    console.log('this is an example')
-  }
+    constructor() public {
+        console.log('this is an example')
+    }
 }
 `.trim();
 
@@ -46,7 +71,7 @@ const Pre = styled.pre`
   height: 100%;
   text-align: left;
   padding: 0.5em;
-  font-size: 14pt;
+  font-size: 10pt;
   line-height: 1.5rem;
   overflow: scroll;
 `;
@@ -150,7 +175,7 @@ function checkSelf(fuses, fuse) {
   } = fusesDict;
 
   if (fuse === CANNOT_APPROVE) {
-    return true
+    return true;
   }
 
   if (fuse === CANNOT_UNWRAP) {
@@ -210,9 +235,9 @@ function generateTable(parentFuses, childFuses) {
   };
 
   const states = [
-    { backgroundColor: 'white', color: 'black' },
-    { backgroundColor: 'rgb(73, 179, 147)', color: 'white' }, // green
-    { backgroundColor: 'rgb(213, 85, 85)', color: 'white' }, // red
+    { backgroundColor: 'white', color: 'rgb(95, 95, 95)' },
+    { backgroundColor: '#C7F2C2', color: 'rgb(95, 95, 95)' }, // green
+    { backgroundColor: '#F2CBC7', color: 'rgb(95, 95, 95)' }, // red
   ];
   const conditions = (fuses, child, key) => {
     if (key === '-') return states[0];
@@ -357,12 +382,12 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
       ? windowWidth + ((1250 - windowWidth) * 550) / windowWidth
       : windowWidth;
   const arrowEndWidth = isPCC
-    ? (windowWidth + 600) / 5.2 * ((index / 42) + 1)
+    ? ((windowWidth + 600) / 5.2) * (index / 42 + 1)
     : (windowWidth - 200) / 1.25;
-  const arrowEndHeight = isPCC ? 450 * ((index / 7) + 1) : 216 + 64 * index;
+  const arrowEndHeight = isPCC ? 450 * (index / 7 + 1) : 216 + 64 * index;
   const arrowStartHeight = 70 + 10 * index;
   const arrowStartWidth = isPCC
-    ? windowWidth / 2.3 * ((index / 46) + 1)
+    ? (windowWidth / 2.3) * (index / 46 + 1)
     : (windowWidth - 100) / 1.72 - 10 * index;
   return (
     <svg
@@ -389,15 +414,21 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
         className="path"
         fill="none"
         stroke="black"
-        stroke-opacity={0.4}
+        strokeOpacity={0.4}
         strokeWidth={3}
         points={`${arrowStartWidth},0 
         ${arrowStartWidth},${arrowStartHeight} 
         ${
-          isPCC ? arrowEndWidth + 40 * (index + 1) : arrowEndWidth - (40 + 10 * index)
+          isPCC
+            ? arrowEndWidth + 40 * (index + 1)
+            : arrowEndWidth - (40 + 10 * index)
         },${arrowStartHeight} ${
-          isPCC ? arrowEndWidth + 40 * (index + 1) : arrowEndWidth - (40 + 10 * index)
-        },${arrowEndHeight} ${isPCC ? arrowEndWidth / (index / 42 + 1): arrowEndWidth}, ${arrowEndHeight}`}
+          isPCC
+            ? arrowEndWidth + 40 * (index + 1)
+            : arrowEndWidth - (40 + 10 * index)
+        },${arrowEndHeight} ${
+          isPCC ? arrowEndWidth / (index / 42 + 1) : arrowEndWidth
+        }, ${arrowEndHeight}`}
         markerEnd="url(#triangle)"
       />
     </svg>
@@ -428,7 +459,6 @@ function createAnchor(windowWidth) {
           markerUnits="strokeWidth"
           markerWidth="20"
           markerHeight="20"
-          orient="down"
         >
           <path
             fill="#adacac"
@@ -504,9 +534,10 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
       setTourNavDisabled(false);
       return (
         <div>
-          If this fuse is burned, a name will be able to extend its own expiry in the NameWrapper. 
-          Does not apply to .eth 2LDs, as the expiry will inherit from the registrar in that case, 
-          and this fuse will not be burned when wrapping/registering .eth 2LDs.
+          If this fuse is burned, a name will be able to extend its own expiry
+          in the NameWrapper. Does not apply to .eth 2LDs, as the expiry will
+          inherit from the registrar in that case, and this fuse will not be
+          burned when wrapping/registering .eth 2LDs.
         </div>
       );
     },
@@ -593,9 +624,10 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
       setTourNavDisabled(false);
       return (
         <div>
-          If this fuse is burned, a name owner cannot give approval to another address. 
-          If approval is already issued before burning this fuse, the approval will remain in target address.
-          Unlike standart ERC-721 approval method, approval won't give transfer permit to the delegatee.
+          If this fuse is burned, a name owner cannot give approval to another
+          address. If approval is already issued before burning this fuse, the
+          approval will remain in target address. Unlike standart ERC-721
+          approval method, approval won't give transfer permit to the delegatee.
         </div>
       );
     },
@@ -627,7 +659,8 @@ const tourConfig = (setParentFuses, setTourNavDisabled) => [
             <h4>That was it!!</h4>
           </center>
           <br />
-          Now, before keep scrolling down to create a new subdomain, lets start with changing state of our NFT to <code>Locked</code>.
+          Now, before keep scrolling down to create a new subdomain, lets start
+          with changing state of our NFT to <code>Locked</code>.
           <button
             className="button"
             onClick={() => {
@@ -671,6 +704,7 @@ const App = () => {
   const [fuseBurned, setFuseBurned] = useState(false);
   const [isTourOpen, setTourOpen] = useState(false);
   const [isTourNavDisabled, setTourNavDisabled] = useState(false);
+  const [isScrollAnimPaused, setScrollAnimPaused] = useState(false);
 
   const scrollPosition = useScrollPosition();
   const [width] = useWindowSize();
@@ -683,6 +717,9 @@ const App = () => {
         polyline.classList.remove('path')
       );
     }
+    isScrollAnimPaused && setScrollAnimPaused(false);
+  } else {
+    !isScrollAnimPaused && setScrollAnimPaused(true);
   }
 
   const handleSubdomainCreation = () => {
@@ -695,6 +732,7 @@ const App = () => {
         } else if (childFuses.has(polyline.id.replace('pl_', ''))) {
           polyline.classList.add('path');
         }
+        polyline.style.opacity = 0.5;
       });
     }
   };
@@ -733,7 +771,7 @@ const App = () => {
               isOpen={isTourOpen}
               maskClassName="mask"
               className="helper"
-              rounded={5}
+              rounded={10}
               startAt={0}
               showNavigation={!isTourNavDisabled}
               showButtons={!isTourNavDisabled}
@@ -791,6 +829,17 @@ const App = () => {
                 />
               </Rail>
             </Panel>
+            <div
+              className="scroll-icon"
+              style={{ opacity: isScrollAnimPaused ? 0 : 1 }}
+            >
+              <Lottie
+                options={defaultOptions}
+                height={100}
+                width={100}
+                isPaused={isScrollAnimPaused || isTourOpen}
+              />
+            </div>
           </>
         ) : (
           <Grid>
@@ -834,7 +883,7 @@ const App = () => {
                         childFuses,
                         setChildFuses,
                         fuse === PARENT_CANNOT_CONTROL ||
-                        fuse === CAN_EXTEND_EXPIRY
+                          fuse === CAN_EXTEND_EXPIRY
                           ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                           : !checkSelf(childFuses, fuse)
                       )
@@ -853,7 +902,7 @@ const App = () => {
             </div>
             <div className="exportCode">
               <div className="tab">
-                <button
+                {/* <button
                   className="tablinks"
                   onClick={(event) => toggleCode(event, 'Javascript')}
                 >
@@ -872,18 +921,26 @@ const App = () => {
                   onClick={(event) => toggleCode(event)}
                 >
                   ✕
-                </button>
+                </button> */}
                 <div className="source">
                   <a href="https://twitter.com/ensdomains">@ensdomains</a> -{' '}
                   <a href="https://github.com/mdtanrikulu/fusebook/">source</a>
                 </div>
               </div>
 
-              <div id="Javascript" className="tabcontent">
+              {/* <div id="Javascript" className="tabcontent">
                 <Highlight
                   {...defaultProps}
                   theme={theme}
-                  code={jsCode}
+                  code={jsCode
+                    .replace(
+                      '{parent_fuses_here',
+                      `[${new Array(...parentFuses).join(', ')}]`
+                    )
+                    .replace(
+                      '{child_fuses_here',
+                      `[${new Array(...childFuses).join(', ')}]`
+                    )}
                   language="js"
                 >
                   {({
@@ -943,7 +1000,7 @@ const App = () => {
                     </Pre>
                   )}
                 </Highlight>
-              </div>
+              </div> */}
             </div>
           </Grid>
         )}
