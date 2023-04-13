@@ -12,8 +12,8 @@ import {
   Heading,
   Typography,
 } from '@ensdomains/thorin';
-import Highlight, { defaultProps } from 'prism-react-renderer';
-import theme from 'prism-react-renderer/themes/nightOwl';
+// import Highlight, { defaultProps } from 'prism-react-renderer';
+// import theme from 'prism-react-renderer/themes/nightOwl';
 import InteractiveView from './Interactive';
 import './App.css';
 
@@ -31,66 +31,66 @@ const defaultOptions = {
 
 const PHASE_5_Y_POS = 4000;
 
-const jsCode = `
-import { ENS } from '@ensdomains/ensjs';
-import { ethers } from 'ethers';
+// const jsCode = `
+// import { ENS } from '@ensdomains/ensjs';
+// import { ethers } from 'ethers';
 
-const PROVIDER_URL = '';
-const provider = new ethers.providers.JsonRpcProvider(PROVIDER_URL);
+// const PROVIDER_URL = '';
+// const provider = new ethers.providers.JsonRpcProvider(PROVIDER_URL);
 
-const ENSInstance = new ENS();
-await ENSInstance.setProvider(provider);
+// const ENSInstance = new ENS();
+// await ENSInstance.setProvider(provider);
 
-await ensInstance.wrapName('ens.eth', {
-  wrappedOwner: ADDRESS,
-  fuseOptions: {
-    parent: {
-      named: {parent_fuses_here}
-    }
-    child: {
-      named: {child_fuses_here},
-    },
-  },
-  addressOrIndex: 1,
-});
-`.trim();
+// await ensInstance.wrapName('ens.eth', {
+//   wrappedOwner: ADDRESS,
+//   fuseOptions: {
+//     parent: {
+//       named: {parent_fuses_here}
+//     }
+//     child: {
+//       named: {child_fuses_here},
+//     },
+//   },
+//   addressOrIndex: 1,
+// });
+// `.trim();
 
-const solidityCode = `
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+// const solidityCode = `
+// //SPDX-License-Identifier: MIT
+// pragma solidity ^0.8.10;
 
-import "hardhat/console.sol";
-contract Example {
-    constructor() public {
-        console.log('this is an example')
-    }
-}
-`.trim();
+// import "hardhat/console.sol";
+// contract Example {
+//     constructor() public {
+//         console.log('this is an example')
+//     }
+// }
+// `.trim();
 
-const Pre = styled.pre`
-  height: 100%;
-  text-align: left;
-  padding: 0.5em;
-  font-size: 10pt;
-  line-height: 1.5rem;
-  overflow: scroll;
-`;
+// const Pre = styled.pre`
+//   height: 100%;
+//   text-align: left;
+//   padding: 0.5em;
+//   font-size: 10pt;
+//   line-height: 1.5rem;
+//   overflow: scroll;
+// `;
 
-const Line = styled.div`
-  display: table-row;
-`;
+// const Line = styled.div`
+//   display: table-row;
+// `;
 
-const LineNo = styled.span`
-  display: table-cell;
-  text-align: right;
-  padding-right: 1em;
-  user-select: none;
-  opacity: 0.5;
-`;
+// const LineNo = styled.span`
+//   display: table-cell;
+//   text-align: right;
+//   padding-right: 1em;
+//   user-select: none;
+//   opacity: 0.5;
+// `;
 
-const LineContent = styled.span`
-  display: table-cell;
-`;
+// const LineContent = styled.span`
+//   display: table-cell;
+// `;
 
 const Grid = styled.div(
   () => css`
@@ -151,14 +151,10 @@ const fusesDict = Object.freeze({
 });
 
 function checkParent(parentFuses, childFuse) {
-  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL, CAN_EXTEND_EXPIRY } = fusesDict;
+  const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL } = fusesDict;
 
   if (childFuse === PARENT_CANNOT_CONTROL) {
     return parentFuses.has(CANNOT_UNWRAP);
-  }
-
-  if (childFuse === CAN_EXTEND_EXPIRY) {
-    return false;
   }
 }
 
@@ -172,7 +168,13 @@ function checkSelf(fuses, fuse) {
     CANNOT_SET_TTL,
     CANNOT_UNWRAP,
     PARENT_CANNOT_CONTROL,
+    CAN_EXTEND_EXPIRY,
   } = fusesDict;
+
+
+  if (fuse === CAN_EXTEND_EXPIRY) {
+    return true;
+  }
 
   if (fuse === CANNOT_APPROVE) {
     return true;
@@ -416,6 +418,7 @@ function createArrow(fuse, index, windowWidth, isPCC = false) {
         stroke="black"
         strokeOpacity={0.4}
         strokeWidth={3}
+        strokeLinejoin="round"
         points={`${arrowStartWidth},0 
         ${arrowStartWidth},${arrowStartHeight} 
         ${
@@ -440,9 +443,9 @@ function createAnchor(windowWidth) {
     windowWidth < 1250
       ? windowWidth + ((1250 - windowWidth) * 550) / windowWidth
       : windowWidth;
-  const arrowEndWidth = (windowWidth - 10) / 2.8;
+  const arrowEndWidth = (windowWidth) / 2.8;
   const arrowEndHeight = 240;
-  const arrowStartHeight = 120;
+  const arrowStartHeight = 130;
   const arrowStartWidth = windowWidth / 2.2;
   return (
     <svg
@@ -472,6 +475,7 @@ function createAnchor(windowWidth) {
         fill="none"
         stroke="brown"
         strokeWidth={6}
+        strokeLinejoin="round"
         points={`${arrowStartWidth},40 
     ${arrowStartWidth},${arrowStartHeight} 
     ${arrowEndWidth},${arrowStartHeight} 
@@ -737,26 +741,26 @@ const App = () => {
     }
   };
 
-  function toggleCode(evt, cityName) {
-    let i, tabcontent, tablinks;
+  // function toggleCode(evt, cityName) {
+  //   let i, tabcontent, tablinks;
 
-    tabcontent = document.getElementsByClassName('tabcontent');
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = 'none';
-    }
+  //   tabcontent = document.getElementsByClassName('tabcontent');
+  //   for (i = 0; i < tabcontent.length; i++) {
+  //     tabcontent[i].style.display = 'none';
+  //   }
 
-    tablinks = document.getElementsByClassName('tablinks');
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(' active', '');
-    }
-    if (cityName) {
-      document.getElementById(cityName).style.display = 'block';
-      document.getElementById('closeTab').style.display = 'block';
-      evt.currentTarget.className += ' active';
-    } else {
-      document.getElementById('closeTab').style.display = 'none';
-    }
-  }
+  //   tablinks = document.getElementsByClassName('tablinks');
+  //   for (i = 0; i < tablinks.length; i++) {
+  //     tablinks[i].className = tablinks[i].className.replace(' active', '');
+  //   }
+  //   if (cityName) {
+  //     document.getElementById(cityName).style.display = 'block';
+  //     document.getElementById('closeTab').style.display = 'block';
+  //     evt.currentTarget.className += ' active';
+  //   } else {
+  //     document.getElementById('closeTab').style.display = 'none';
+  //   }
+  // }
 
   const { CANNOT_UNWRAP, PARENT_CANNOT_CONTROL, CAN_EXTEND_EXPIRY } = fusesDict;
   return (
@@ -853,6 +857,7 @@ const App = () => {
                   </pre>
                   {Object.values(fusesDict)
                     .reverse()
+                    .filter(fuse => fuse !== CAN_EXTEND_EXPIRY)
                     .map((fuse, index) =>
                       generateCheckbox(
                         index,
@@ -861,7 +866,7 @@ const App = () => {
                         parentFuses,
                         setParentFuses,
                         fuse === PARENT_CANNOT_CONTROL
-                          ? false
+                          ? true
                           : !checkSelf(parentFuses, fuse)
                       )
                     )}
@@ -882,8 +887,7 @@ const App = () => {
                         fuse,
                         childFuses,
                         setChildFuses,
-                        fuse === PARENT_CANNOT_CONTROL ||
-                          fuse === CAN_EXTEND_EXPIRY
+                        fuse === PARENT_CANNOT_CONTROL
                           ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                           : !checkSelf(childFuses, fuse)
                       )

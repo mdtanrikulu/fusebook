@@ -56,6 +56,7 @@ function generateCheckbox(
   isSubname = false,
   nonce = ''
 ) {
+  if (!isSubname && label === 'CAN_EXTEND_EXPIRY') disabled = true;
   return (
     <div
       key={`checkbox-${index}`}
@@ -245,8 +246,7 @@ export default function InteractiveView({
                     fuse,
                     isSubname ? childFuses : parentFuses,
                     isSubname ? setChildFuses : setParentFuses,
-                    fuse === PARENT_CANNOT_CONTROL ||
-                    fuse === CAN_EXTEND_EXPIRY
+                    fuse === PARENT_CANNOT_CONTROL
                       ? isSubname
                         ? !checkParent(parentFuses, PARENT_CANNOT_CONTROL)
                         : null
